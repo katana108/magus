@@ -20,6 +20,24 @@
 
 
 ; ============================
+; Arousal Modulator
+; ============================
+
+(: arousal-level (-> Number))
+(= (arousal-level) 0.5)
+
+(: arousal-bias (-> Symbol Number))
+(= (arousal-bias Explore) (+ 0.5 (arousal-level)))
+(= (arousal-bias Talk) (+ 0.5 (- 1.0 (abs (- (arousal-level) 0.5)))))
+(= (arousal-bias Rest) (+ 0.5 (- 1.0 (arousal-level))))
+
+(: update-arousal (-> Bool Number))
+(= (update-arousal $success)
+   (if $success 
+       (min 1.0 (+ (arousal-level) 0.1))
+       (max 0.0 (- (arousal-level) 0.1))))
+
+; ============================
 ; Action Definition
 ; ============================
 
@@ -70,7 +88,9 @@
 (= (decision-score $a)
    (let $cs (get-considerations $a)
      (let $ds (get-discouragements $a)
-       (* (gmean $cs) (product $ds)))))
+       (let $action-name (get-action-name $a)
+         (* (arousal-bias $action-name)
+            (* (gmean $cs) (product $ds)))))))
 
 
 
@@ -94,7 +114,7 @@
 (: max-score (-> Number))
 (= (max-score)
     (let $scores (score-all) 
-    (let $finals (map-atom $scores $a (splitr $a))
+    (let $finals (map-atom $scores $a (eval (splitr $a)))
         (max-atom $finals))))
 
 ; ============================
@@ -126,11 +146,23 @@
 ; Usage
 ; ============================
 
+! (arousal-level)
+; → current arousal level (0.0 to 1.0)
+
 ! (score-all)
-; → list of (action-name score) pairs
+; → list of (action-name score) pairs with arousal bias
 
 ! (max-score)
-; ; → best (action-name score)
+; → best (action-name score)
 
-; ! (choose-best-action)
-; ; → action name with highest decision-score (e.g., Talk)
+! (choose-best-action)
+; → action name with highest arousal-modulated decision-score
+
+; ============================
+; Arousal Testing
+; ============================
+
+; Test arousal bias at current level (0.5)
+! (arousal-bias Explore)
+! (arousal-bias Talk) 
+! (arousal-bias Rest)

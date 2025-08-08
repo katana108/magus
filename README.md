@@ -1,93 +1,185 @@
-# MeTTa-Magus
+# MAGUS Goal Hierarchy System
 
+Anna's experimental implementation of goal hierarchies for the MAGUS (Modular Adaptive Goal and Utility System) framework, built in MeTTa language.
 
+## Project Overview
 
-## Getting started
+This project explores goal-driven decision making for AGI systems, implementing both traditional action-evaluation systems and novel goal hierarchy architectures. The work builds on OpenPsi motivational frameworks while developing new approaches for self-modifying AI goal systems.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## What We've Built
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+### Core Systems
 
-## Add your files
+1. **Action Evaluation System** (`magus.metta`) - Original MAGUS implementation  
+2. **Goal Hierarchy System** (`working-self-modify.metta`) - Anna's experimental demand-based architecture
+3. **OVERGOAL Meta-System** - Self-evaluating goal fitness framework
+4. **Goal Weighting System v1** (`magus-goal-weighting-v1.metta`) - Modular importance × urgency calculations *(Added 2025-08-08)*
+5. **Action Evaluation Prototype v1** (`magus-action-evaluation-prototype-v1.metta`) - Considerations/discouragements system *(Added 2025-08-08)*
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+### Key Files Created
 
+#### Main Implementations
+- **`magus.metta`** - Original MAGUS decision system with geometric mean scoring
+  - Actions: Talk, Rest, Explore
+  - Arousal modulator affecting action preferences
+  - Geometric mean of considerations × product of discouragements
+
+- **`working-self-modify.metta`** - Anna's demand-based goal hierarchy
+  - Three primary demands: Energy, Affinity, Exploration  
+  - Self-modifying behavior generation
+  - OVERGOAL system for goal fitness evaluation
+
+#### Modular Decision System v1 *(Added 2025-08-08)*
+- **`magus-goal-weighting-v1.metta`** - Goal importance and urgency calculations
+  - Weight = importance × urgency (where urgency = 1.0 - satisfaction)
+  - Fixed importance values: Exploration=0.6, Affinity=0.7, Energy=0.9
+  - Current satisfaction levels determine urgency dynamically
+  
+- **`magus-action-evaluation-prototype-v1.metta`** - Action scoring with considerations/discouragements
+  - Each action evaluated for each goal separately
+  - Considerations: geometric_mean (higher = better for goal)
+  - Discouragements: product (lower = more blocking)
+  - Final score: weight × geometric_mean(considerations) × product(discouragements)
+  - Integrates with goal weighting system for dynamic weights
+
+- **`magus-goal-weighting-v1.py`** - Python mirror of goal weighting system
+- **`magus-action-evaluation-prototype-v1.py`** - Python mirror of action evaluation system
+
+#### Test and Development Files
+- **`anna-demands-test.metta`** - Basic testing of demand/goal creation
+- **`self-modifying-demo.metta`** - Early complex demo (syntax issues)
+- **`simple-self-modify.metta`** - Simplified version for debugging
+
+#### Documentation
+- **`CLAUDE.md`** - Project context and MeTTa guidance
+- **`MAGUS-Arousal-Modulator-Specification.md`** - Arousal system specification
+- **`Village_of_Grit_Testing_Specs.md`** - AI agent testing scenario for validation *(Added 2025-08-08)*
+
+## Key Discoveries
+
+### 1. OpenPsi vs MAGUS Terminology
+- **OpenPsi Demands** = MAGUS Primary Goals (Energy, Affinity, Exploration)
+- **OpenPsi Goals** = MAGUS Subgoals (specific measurable objectives)  
+- **OpenPsi Actions** = MAGUS Actions (atomic executable behaviors)
+
+### 2. MeTTa's Code-as-Data Power
+Successfully demonstrated how:
+- Demand atoms `(demand energy 0.2)` generate executable decision logic
+- System creates new behavior functions based on internal state changes
+- Same code produces different behaviors when data changes
+
+### 3. OVERGOAL Implementation
+Built working meta-goal system that:
+- Evaluates measurability of goals (80% average)
+- Assesses correlation between goals (60% average)  
+- Recommends goal structure changes (48% fitness → "RESTRUCTURE-GOALS")
+- Never fully satisfied (drives continuous self-improvement)
+
+## Technical Architecture
+
+### Demand-Based Foundation
+```metta
+!(addDemand &demands energy 0.2)    ; Low energy - critical
+!(addDemand &demands affinity 0.8)  ; High social connection  
+!(addDemand &demands exploration 0.5) ; Medium curiosity
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/the-smithy1/magi/Neoterics/metta-magus.git
-git branch -M main
-git push -uf origin main
+
+### Self-Modifying Behavior
+```metta
+(= (behaviorFor energy)
+    (let $val (getDemandValue energy)
+        (:: energy-behavior
+            current-level $val
+            recommended-action URGENT-REST)))
 ```
 
-## Integrate with your tools
+### OVERGOAL Meta-Evaluation
+```metta
+(= (overgoal-satisfaction)
+    (:: overgoal-satisfaction 
+        measurability $avg-measurability
+        correlation $avg-correlation
+        overall-fitness (* $avg-measurability $avg-correlation)))
+```
 
-- [ ] [Set up project integrations](https://gitlab.com/the-smithy1/magi/Neoterics/metta-magus/-/settings/integrations)
+## Running the Code
 
-## Collaborate with your team
+### Prerequisites
+- MeTTa Python interpreter (`metta-py`)
+- Hyperon MeTTa environment
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### Basic Usage
+```bash
+# Test basic demand system
+metta-py anna-demands-test.metta
 
-## Test and Deploy
+# Run full self-modifying system with OVERGOAL
+metta-py working-self-modify.metta
 
-Use the built-in continuous integration in GitLab.
+# Run original MAGUS action evaluation
+metta-py magus.metta
+```
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## Key Learning Insights
 
-***
+### MeTTa Language Concepts
+- **Atoms**: Fundamental knowledge units (demands, goals, actions)
+- **Spaces**: Separate "databases" for organizing different atom types
+- **Pattern Matching**: Core paradigm for data extraction and logic
+- **Confidence**: Reliability measures affecting decision weight
+- **Code = Data**: Functions and data use same atom format, enabling self-modification
 
-# Editing this README
+### Design Principles
+- **Simple math**: Goal hierarchies need basic comparison, not complex scoring
+- **Utility functions**: Bridge between actions and demand satisfaction  
+- **Urge calculation**: `desired_value - current_value` drives goal activation
+- **Hierarchical flow**: Parent demands activate child goals through rule chains
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## Current Status
 
-## Suggestions for a good README
+### Working Systems ✅
+- Basic demand creation and management
+- Self-modifying behavior generation based on internal state
+- OVERGOAL meta-evaluation of goal system fitness
+- Code-as-data demonstrations
+- **Modular decision system v1 with goal weighting and action evaluation** *(Completed 2025-08-08)*
+- **Python mirrors for educational and integration purposes** *(Completed 2025-08-08)*
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+### Recent Achievements (2025-08-08) ✨
+- **Complete decision pipeline**: Goal weights → Action evaluation → Best action selection
+- **Verified mathematical correctness**: Geometric mean for considerations, product for discouragements
+- **Modular architecture**: Separate goal weighting and action evaluation systems that integrate seamlessly
+- **Dual implementation**: Both MeTTa and Python versions for maximum accessibility
+- **Test results**: REST action (0.526) beats EXPLORE (0.174) in prototype test scenario
 
-## Name
-Choose a self-explaining name for your project.
+### Next Steps 🚀
+- Test with Village of Grit scenarios (stage 2)
+- Design proper utility functions linking actions to demands
+- Implement goal promotion/demotion based on OVERGOAL feedback
+- Add temporal dynamics and learning mechanisms
+- Integrate with broader MAGUS cognitive architecture
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## Research Context
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+This work contributes to AGI motivational architecture research by:
+- Bridging classical OpenPsi frameworks with modern goal-driven AI
+- Demonstrating practical self-modifying goal systems
+- Implementing OVERGOAL meta-cognition for ethical alignment
+- Exploring MeTTa language capabilities for symbolic AGI development
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+## Files Structure
+```
+metta-magus/
+├── README.md                              # This file
+├── CLAUDE.md                              # Project documentation
+├── magus.metta                           # Original action-evaluation system
+├── working-self-modify.metta             # Main goal hierarchy + OVERGOAL system
+├── anna-demands-test.metta               # Basic testing framework
+├── MAGUS-Arousal-Modulator-Specification.md  # Arousal system spec
+└── [other experimental files]
+```
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+---
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+*Last updated: 2025-08-08*  
+*Status: Modular decision system v1 complete, ready for Village of Grit testing*
