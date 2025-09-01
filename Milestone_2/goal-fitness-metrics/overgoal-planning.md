@@ -18,6 +18,8 @@
   = (Energy: 0.72 + Exploration: 0.56 + Affinity: 0.20) / 3
   = 1.48 / 3 = 0.49
 
+  **** also consider geometric sum?
+
   Total Correlation Score
 
   Total_Correlation = Average of all pairwise correlations
@@ -33,7 +35,6 @@
 
   Measurability challenges:
   - Perfect measurement (1.0) requires perfect sensors, perfect definitions, zero noise
-  - Even "good" goals like Energy rarely exceed 0.8-0.9 measurability
   - Social goals like Affinity inherently have measurement challenges
 
   Correlation challenges:
@@ -56,21 +57,13 @@
   - The Overgoal provides system-level feedback on goal system health
   - NEED TO DETERMINE FORMULA
 
+  Goal Promotion
+  ...
+
 
   Overgoal score
-  - how do we keep it from reaching 1? for example:
-        Theoretical Maximum < 1
-
-        Set realistic ceiling based on system constraints:
-        Theoretical_Maximum = 0.85  // Based on physical/cognitive limits
-        Overgoal = (Measurability × Correlation) × Theoretical_Maximum
-
-        Justification:
-        - Perfect measurement impossible due to sensor limitations
-        - Perfect correlation impossible due to goal diversity requirements
-        - Perfect system impossible due to computational/resource constraints
-
-- and what could be an ideal score?
+  - how do we keep it from reaching 1? with ASSERT
+- and what could be an ideal score? 
 - or should we use measurability-weighted correlation between 2 goals?
 - will goals with certain general direction overpower other goals and tilt the equation into their side?
 - what if goals have different measurability?

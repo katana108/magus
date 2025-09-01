@@ -20,9 +20,11 @@ How confident are we that our goal satisfaction measurement reflects reality?
 
 
 **Examples**:
-- Energy goal with "battery" + rest tracking = 0.9 confidence
+- Energy goal with "battery" + rest tracking = 1 confidence
 - Affinity goal based only self-report + amount of interactions  = 0.4 confidence
 - Exploration goal with activity logs = 0.8 confidence
+
+*** in future we use pattern miner
 
 ### 2. Metric_Clarity (0.0 - 1.0)
 How clearly defined and unambiguous is our goal measurement?
@@ -31,12 +33,13 @@ How clearly defined and unambiguous is our goal measurement?
 - **Measurement objectivity**: Noise vs. quantifiable metrics
 - **Boundary clarity**: Clear thresholds vs. fuzzy boundaries
 - **Interpretability**: Easy to understand vs. complex composite scores
+- **Occam's Razor**: simplicity algorythm 
 
 **Examples**:
-- Energy: "Battery percentage from 0-100%" = 0.9 clarity
+- Energy: "Battery percentage from 0-100%" = 1 clarity
 - Affinity: "Quality of social connections" = 0.3 clarity (too vague)
    - but would that mean that Affinity is always vague..? Because of theory of mind
-- Exploration: "New locations visited per day" = 0.8 clarity
+- Exploration: "New locations visited per day" = 0.9 clarity
 
 ## Implementation Strategy
 
@@ -70,7 +73,7 @@ Dynamically adjust measurability based on:
 
 ### Data Requirements
 - **Measurement history**: Track goal satisfaction values over time
-- **Measurement metadata**: Source, timestamp, quality indicators
+- **Measurement metadata**: Source, timestamp
 - **Variance analysis**: Standard deviation, outlier detection
 - **Validation data**: Cross-references, ground truth comparisons
 
@@ -78,12 +81,11 @@ Dynamically adjust measurability based on:
 1. **Confidence calculation**:
    - Base confidence from data source quality
    - Adjust for sample size (more data = higher confidence)
-   - Penalize for high variance/inconsistency
    - Boost for recent validation
 
 2. **Clarity calculation**:
    - Base clarity from goal definition specificity
-   - Adjust for measurement objectivity
+   - Adjust for simplicity using occam's razor 
    - Consider threshold/boundary precision
 
 ### Integration with Correlation
@@ -97,6 +99,7 @@ Goals with higher measurability get weighted more heavily in decision-making, en
 
 ### Technical
 - Should measurability be calculated per goal globally, or per goal-pair for correlations?
+   per measure per goal satisfaction
 - How often to recalculate measurability scores?
 - What's the minimum measurability threshold for including a goal in decisions?
 
