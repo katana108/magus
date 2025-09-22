@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Milestone_2/Testing_scenario/goal-ranking-system-planning.md",
+                "file": "Lake's Notes for future incorporation.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "goal-ranking-system-planning"
+              "title": "Lake's Notes for future incorporation"
             }
           }
         ]
@@ -169,25 +169,43 @@
       "bases:Create new base": false
     }
   },
-  "active": "5facb87b5a6fb265",
+  "active": "45c11ff42b73d0dd",
   "lastOpenFiles": [
-    "Milestone_2/goal-fitness-metrics/correlation/goal-correlation-planning.md",
+    "Village_of_Grit_Testing_Specs.md",
+    "README.md",
+    "MAGUS-Arousal-Modulator-Specification.md",
+    "MAGUS_Project_Overview_18-08.md",
+    "Lake's Notes for future incorporation.md",
+    "metta-lang/Minimal MeTTa.md",
+    "metta-lang/MeTTa-Motto.md",
+    "metta-lang/Embedding Python objects into MeTTa.md",
+    "metta-lang/Parsing grounded atoms.md",
+    "metta-lang/Running MeTTa in Python.md",
+    "metta-lang/Operations over atoms.md",
+    "metta-lang/Control flow.md",
+    "metta-lang/Working with spaces.md",
+    "metta-lang/Handling nondeterministic results.md",
+    "metta-lang/Console output and debugging.md",
+    "metta-lang/Basic grounded functions.md",
+    "metta-lang/Controlling pattern matching.md",
+    "metta-lang/Metatypes.md",
+    "metta-lang/Recursive and parametric types.md",
+    "metta-lang/Concrete types.md",
+    "metta-lang/Nested queries and recursive graph traversal.md",
+    "metta-lang/Functions and unification.md",
+    "metta-lang/Querying space content.md",
+    "metta-lang/Recursion and control.md",
+    "metta-lang/Free variables and nondeterminism again, recursively.md",
+    "metta-lang/Main concepts.md",
+    "metta-lang",
+    "transcripts/Untitled",
+    "transcripts/MORKication Weekly.txt",
+    "transcripts/New Text Document.txt",
+    "transcripts",
+    "New folder",
     "Milestone_2/goal-fitness-metrics/__pycache__/initial_measurability_calculation.cpython-312.pyc",
     "Milestone_2/goal-fitness-metrics/__pycache__/initial_correlation_calculation.cpython-312.pyc",
     "Milestone_2/goal-fitness-metrics/measurability/test-measurability.metta",
-    "Milestone_2/goal-fitness-metrics/measurability/test_measurability.py",
-    "Milestone_2/goal-fitness-metrics/measurability/initial_measurability_calculation.py",
-    "Milestone_2/goal-fitness-metrics/measurability/initial_measurability_calculation.metta",
-    "Milestone_2/goal-fitness-metrics/measurability/goal-measurability-planning.md",
-    "Milestone_2/goal-fitness-metrics/debuging/debug-measurability.metta",
-    "Milestone_2/goal-fitness-metrics/debuging/manual-test.metta",
-    "Milestone_2/goal-fitness-metrics/correlation/test_correlations.py",
-    "Milestone_2/goal-fitness-metrics/correlation/initial_correlation_calculation.py",
-    "Milestone_2/Prototyping_report/agi-integration-strategic-analysis.md",
-    "Milestone_2/Testing_scenario/goal-ranking-system-planning.md",
-    "Milestone_2/goal-fitness-metrics/overgoal-planning.md",
-    "MAGUS_Project_Overview_18-08.md",
-    "MAGUS-Arousal-Modulator-Specification.md",
-    "CLAUDE.md"
+    "Milestone_2/goal-fitness-metrics/measurability/test_measurability.py"
   ]
 }
