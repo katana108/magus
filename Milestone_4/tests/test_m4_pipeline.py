@@ -46,7 +46,7 @@ def test_scenario_schema():
         "Simple test scenario"
         (list testing)
         low
-        (context test-lab normal safe Nil)
+        (scenario-context test-lab normal safe Nil)
         (list (goal test-goal 0.5 1.0))
         Nil
         (list (metric-boolean pass True))

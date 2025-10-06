@@ -1,10 +1,10 @@
 ;; MAGUS Milestone 4: Ethical Suite Tests
 ;; Comprehensive tests for ethical scenario framework
 
-!(import! &self ../../ethical/scenarios.metta)
-!(import! &self ../../ethical/scenario-runner.metta)
-!(import! &self ../../evaluation/benchmarks.metta)
-!(import! &self ../../evaluation/ablations.metta)
+!(load ../../ethical/scenarios.metta)
+!(load ../../ethical/scenario-runner.metta)
+!(load ../../evaluation/benchmarks.metta)
+!(load ../../evaluation/ablations.metta)
 
 ;; =============================================================================
 ;; Test 1: Scenario Schema Validation
