@@ -1556,7 +1556,7 @@ The path from theoretical foundations (OpenPsi, Overgoals, instrumental converge
 
 MAGUS is a step toward AGI systems that are **adaptive** (metrics inform strategy), **ethical** (constraints enforced compositionally), and **interpretable** (decisions traceable to first principles). The code, tests, and documentation are available for reproduction and extension.
 
-**Final Word Count**: ~11,200 words (within 8,000-12,000 target for conference submission)
+**Final Word Count**: ~10,535 words (within 8,000-12,000 target for conference submission)
 
 ---
 

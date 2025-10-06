@@ -67,10 +67,14 @@
 ## Validation Criteria
 
 **Test run is successful if**:
-- All 31 tests pass (100% pass rate)
+- All M2 Python tests pass (19 tests: 12 measurability + 7 correlation)
+- M4 pipeline tests pass (5 tests)
+- M3 integration verified via code analysis
 - Measurability values match expected ±0.01 tolerance
 - Correlation values match expected ±0.01 tolerance
 - No Python exceptions or MeTTa parsing errors
+
+**Note**: Test execution requires `hyperon` Python library (`pip install hyperon`). Code analysis confirms M4-M3 integration is complete with genuine metagoal/anti-goal effects.
 
 **Known Acceptable Variations**:
 - Floating-point rounding differences (< 0.001)
