@@ -18,6 +18,7 @@
 (: planning-context (-> WorldState Goal Number PlanningContext))
 
 ;; Planning depth limit
+(: max-planning-depth (-> Number))
 (= (max-planning-depth) 10)
 
 ;; Step cost accumulator
@@ -29,6 +30,7 @@
 ;; =============================================================================
 
 ;; Define available actions with structured predicates
+(: get-action-spec (-> Symbol ActionSpec))
 (= (get-action-spec move)
    (action-spec move
      (Cons from (Cons to Nil))                      ;; parameters
@@ -72,6 +74,7 @@
      15))
 
 ;; Get all available actions
+(: available-actions (-> (List Symbol)))
 (= (available-actions)
    (Cons move
    (Cons pickup
@@ -347,6 +350,7 @@
 ;; =============================================================================
 
 ;; Export main functions for use by other modules
+(: planner-module-exports (-> (List Symbol)))
 (= (planner-module-exports)
    (list
      plan-for-goal

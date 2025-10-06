@@ -267,6 +267,7 @@
 ;; Export Functions
 ;; =============================================================================
 
+(: ablations-exports (-> (List Symbol)))
 (= (ablations-exports)
    (list
      set-ablation

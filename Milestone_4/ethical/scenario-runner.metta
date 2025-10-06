@@ -296,6 +296,7 @@
 ;; Export Functions
 ;; =============================================================================
 
+(: scenario-runner-exports (-> (List Symbol)))
 (= (scenario-runner-exports)
    (list
      run-scenario

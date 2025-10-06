@@ -292,6 +292,7 @@
 ;; Export Functions
 ;; =============================================================================
 
+(: hermes-v2-exports (-> (List Symbol)))
 (= (hermes-v2-exports)
    (list
      build-causal-chain

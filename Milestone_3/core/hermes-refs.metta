@@ -17,12 +17,19 @@
 ;; =============================================================================
 
 ;; Define standard edge types
+(: edge-type-causes (-> Symbol))
 (= (edge-type-causes) causes)
+(: edge-type-enables (-> Symbol))
 (= (edge-type-enables) enables)
+(: edge-type-prevents (-> Symbol))
 (= (edge-type-prevents) prevents)
+(: edge-type-correlates (-> Symbol))
 (= (edge-type-correlates) correlates)
+(: edge-type-implies (-> Symbol))
 (= (edge-type-implies) implies)
+(: edge-type-supports (-> Symbol))
 (= (edge-type-supports) supports)
+(: edge-type-opposes (-> Symbol))
 (= (edge-type-opposes) opposes)
 
 ;; Check if edge type is positive
@@ -327,6 +334,7 @@
 ;; =============================================================================
 
 ;; Export main functions for use by other modules
+(: hermes-refs-exports (-> (List Symbol)))
 (= (hermes-refs-exports)
    (list
      create-goal-evidence

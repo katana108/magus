@@ -360,6 +360,7 @@
                      GameAdapter))
 
 ;; Default MUD adapter
+(: mud-adapter (-> GameAdapter))
 (= (mud-adapter)
    (adapter-config mud
      (Cons (move go)
@@ -371,6 +372,7 @@
      Nil))))
 
 ;; Minecraft adapter
+(: minecraft-adapter (-> GameAdapter))
 (= (minecraft-adapter)
    (adapter-config minecraft
      (Cons (move walk)
@@ -399,6 +401,7 @@
 ;; =============================================================================
 
 ;; Export main functions for use by other modules
+(: airis-integration-exports (-> (List Symbol)))
 (= (airis-integration-exports)
    (list
      airis-magus-pipeline
