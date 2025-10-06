@@ -124,22 +124,26 @@
 ;; Get base energy cost from knowledge base
 (: get-base-energy-cost (-> Symbol Number))
 (= (get-base-energy-cost $action)
-   (let $result (match &energy-costs
-                   (action-energy-cost $action $cost $mult)
-                   $cost)
-     (if (== $result Empty)
-         (default-energy-cost)
-         $result)))
+   (extract-energy-cost
+     (match &energy-costs
+       (action-energy-cost $action $cost $mult)
+       (action-energy-cost $action $cost $mult))))
+
+(: extract-energy-cost (-> $a Number))
+(= (extract-energy-cost Empty) (default-energy-cost))
+(= (extract-energy-cost (action-energy-cost $_ $cost $_)) $cost)
 
 ;; Get distance multiplier from knowledge base
 (: get-distance-multiplier (-> Symbol Number))
 (= (get-distance-multiplier $action)
-   (let $result (match &energy-costs
-                   (action-energy-cost $action $cost $mult)
-                   $mult)
-     (if (== $result Empty)
-         0.0
-         $result)))
+   (extract-distance-mult
+     (match &energy-costs
+       (action-energy-cost $action $cost $mult)
+       (action-energy-cost $action $cost $mult))))
+
+(: extract-distance-mult (-> $a Number))
+(= (extract-distance-mult Empty) 0.0)
+(= (extract-distance-mult (action-energy-cost $_ $_ $mult)) $mult)
 
 ;; Calculate total energy cost with parameters and context
 (: calculate-energy-cost (-> Symbol (List $a) Context Number))
@@ -171,22 +175,26 @@
 ;; Get base risk level from knowledge base
 (: get-base-risk-level (-> Symbol Number))
 (= (get-base-risk-level $action)
-   (let $result (match &risk-costs
-                   (action-risk-level $action $risk $mult)
-                   $risk)
-     (if (== $result Empty)
-         (default-risk-level)
-         $result)))
+   (extract-risk-level
+     (match &risk-costs
+       (action-risk-level $action $risk $mult)
+       (action-risk-level $action $risk $mult))))
+
+(: extract-risk-level (-> $a Number))
+(= (extract-risk-level Empty) (default-risk-level))
+(= (extract-risk-level (action-risk-level $_ $risk $_)) $risk)
 
 ;; Get context multiplier from knowledge base
 (: get-context-multiplier (-> Symbol Number))
 (= (get-context-multiplier $action)
-   (let $result (match &risk-costs
-                   (action-risk-level $action $risk $mult)
-                   $mult)
-     (if (== $result Empty)
-         0.0
-         $result)))
+   (extract-context-mult
+     (match &risk-costs
+       (action-risk-level $action $risk $mult)
+       (action-risk-level $action $risk $mult))))
+
+(: extract-context-mult (-> $a Number))
+(= (extract-context-mult Empty) 0.0)
+(= (extract-context-mult (action-risk-level $_ $_ $mult)) $mult)
 
 ;; Calculate total risk with parameters and context
 (: calculate-risk-level (-> Symbol (List $a) Context Number))
@@ -201,12 +209,14 @@
 ;; Get danger multiplier from knowledge base
 (: get-danger-multiplier (-> Symbol Number))
 (= (get-danger-multiplier $danger-level)
-   (let $result (match &context-factors
-                   (danger-level $danger-level $mult)
-                   $mult)
-     (if (== $result Empty)
-         1.0
-         $result)))
+   (extract-danger-mult
+     (match &context-factors
+       (danger-level $danger-level $mult)
+       (danger-level $danger-level $mult))))
+
+(: extract-danger-mult (-> $a Number))
+(= (extract-danger-mult Empty) 1.0)
+(= (extract-danger-mult (danger-level $_ $mult)) $mult)
 
 ;; =============================================================================
 ;; Risky Goal Detection (Data-Driven)
@@ -215,12 +225,14 @@
 ;; Check if goal is risky using knowledge base
 (: get-goal-risk-level (-> Symbol Number))
 (= (get-goal-risk-level $goal-name)
-   (let $result (match &risky-goals
-                   (risky-goal $goal-name $risk)
-                   $risk)
-     (if (== $result Empty)
-         0.0  ;; Not risky
-         $result)))
+   (extract-goal-risk
+     (match &risky-goals
+       (risky-goal $goal-name $risk)
+       (risky-goal $goal-name $risk))))
+
+(: extract-goal-risk (-> $a Number))
+(= (extract-goal-risk Empty) 0.0)  ;; Not risky
+(= (extract-goal-risk (risky-goal $_ $risk)) $risk)
 
 ;; Check if goal exceeds risk threshold (0.5)
 (: is-risky-goal-v2 (-> Symbol Bool))
@@ -276,6 +288,7 @@
 ;; Export Functions
 ;; =============================================================================
 
+(: antigoal-costs-exports (-> (List Symbol)))
 (= (antigoal-costs-exports)
    (list
      calculate-energy-cost

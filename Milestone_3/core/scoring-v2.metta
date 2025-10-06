@@ -253,6 +253,7 @@
 ;; base_weight, metagoal_weight, antigoal_strength
 
 ;; Default weights
+(: default-scoring-weights (-> ScoringWeights))
 (= (default-scoring-weights)
    (scoring-weights 1.0 0.3 1.0))
 
@@ -356,6 +357,7 @@
 ;; =============================================================================
 
 ;; Export main functions for use by other modules
+(: scoring-v2-module-exports (-> (List Symbol)))
 (= (scoring-v2-module-exports)
    (list
      score-decision-v2

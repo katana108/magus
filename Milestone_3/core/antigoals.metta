@@ -14,10 +14,13 @@
 ;; =============================================================================
 
 ;; Configuration parameters
+(: energy-threshold (-> Number))
 (= (energy-threshold) 15)
+(: risk-threshold (-> Number))
 (= (risk-threshold) 0.6)
 
 ;; Energy Efficiency anti-goal - discourages high energy cost actions
+(: energy-efficiency-antigoal (-> AntiGoal))
 (= (energy-efficiency-antigoal)
    (anti-goal energy-efficiency Soft energy-penalty))
 
@@ -38,6 +41,7 @@
 ;; - Fatigue multipliers from agent context state
 
 ;; Risk Avoidance anti-goal - discourages actions with high negative outcome potential
+(: risk-avoidance-antigoal (-> AntiGoal))
 (= (risk-avoidance-antigoal)
    (anti-goal risk-avoidance Soft risk-penalty))
 
@@ -67,6 +71,7 @@
 ;; =============================================================================
 
 ;; Safety constraint - hard veto on unsafe actions
+(: safety-antigoal (-> AntiGoal))
 (= (safety-antigoal)
    (anti-goal safety Hard safety-check))
 
@@ -86,6 +91,7 @@
 (= (is-unsafe-action $other $params $context) False)
 
 ;; Ambiguity constraint - prevents actions with unclear outcomes
+(: ambiguity-antigoal (-> AntiGoal))
 (= (ambiguity-antigoal)
    (anti-goal ambiguity Hard ambiguity-check))
 
@@ -212,6 +218,7 @@
 ;; =============================================================================
 
 ;; Default configuration with all anti-goals
+(: default-antigoal-config (-> (List AntiGoalConfig)))
 (= (default-antigoal-config)
    (Cons (ag-config (energy-efficiency-antigoal) 1.0 True)
    (Cons (ag-config (risk-avoidance-antigoal) 1.0 True)
@@ -258,6 +265,7 @@
 ;; =============================================================================
 
 ;; Export main functions for use by other modules
+(: antigoals-module-exports (-> (List Symbol)))
 (= (antigoals-module-exports)
    (list
      apply-antigoals

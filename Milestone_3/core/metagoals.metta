@@ -53,6 +53,7 @@
 ;; =============================================================================
 
 ;; Create a new metric window
+(: create-window (-> Number Number MetricWindow))
 (= (create-window $duration $current-time)
    (metric-window (- $current-time $duration) $current-time))
 
@@ -88,18 +89,22 @@
 ;; =============================================================================
 
 ;; Coherence metagoal: promotes consistency across goals
+(: coherence-metagoal (-> Metagoal))
 (= (coherence-metagoal)
    (metagoal coherence))
 
 ;; Efficiency metagoal: optimizes for resource usage
+(: efficiency-metagoal (-> Metagoal))
 (= (efficiency-metagoal)
    (metagoal efficiency))
 
 ;; Learning/Growth metagoal: promotes novelty and value
+(: learning-metagoal (-> Metagoal))
 (= (learning-metagoal)
    (metagoal learning))
 
 ;; Uncertainty reduction metagoal
+(: uncertainty-metagoal (-> Metagoal))
 (= (uncertainty-metagoal)
    (metagoal uncertainty-reduction))
 
@@ -197,11 +202,17 @@
 ;; =============================================================================
 
 ;; Configuration parameters with hysteresis
+(: promotion-measurability-threshold (-> Number))
 (= (promotion-measurability-threshold) 0.7)
+(: promotion-correlation-threshold (-> Number))
 (= (promotion-correlation-threshold) 0.8)
+(: demotion-measurability-threshold (-> Number))
 (= (demotion-measurability-threshold) 0.3)
+(: demotion-correlation-threshold (-> Number))
 (= (demotion-correlation-threshold) 0.2)
+(: evaluation-window-duration (-> Number))
 (= (evaluation-window-duration) 1000)  ;; Time units
+(: hysteresis-factor (-> Number))
 (= (hysteresis-factor) 0.1)  ;; Prevents oscillation
 
 ;; Promote signals to subgoals when thresholds are met
@@ -332,6 +343,7 @@
 ;; =============================================================================
 
 ;; Export main functions for use by other modules
+(: metagoals-module-exports (-> (List Symbol)))
 (= (metagoals-module-exports)
    (list
      evaluate-all-metagoals
