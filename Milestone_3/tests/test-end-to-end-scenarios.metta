@@ -76,15 +76,57 @@
 ;; Setup: Player low on health, treasure nearby offers immediate reward
 ;; but conflicts with survival metagoal
 
+;; Named consideration functions (avoid inline lambdas)
+(: treasure-value-score (-> ScoringContext Number))
+(= (treasure-value-score $ctx) 80)
+
+(: treasure-proximity-score (-> ScoringContext Number))
+(= (treasure-proximity-score $ctx) 30)
+
+(: health-need-score (-> ScoringContext Number))
+(= (health-need-score $ctx) 60)
+
+(: health-critical-score (-> ScoringContext Number))
+(= (health-critical-score $ctx) 60)
+
+(: low-health-risk-score (-> ScoringContext Number))
+(= (low-health-risk-score $ctx) 40)
+
+(: enemy-vulnerable-score (-> ScoringContext Number))
+(= (enemy-vulnerable-score $ctx) 100)
+
+(: potential-victory-score (-> ScoringContext Number))
+(= (potential-victory-score $ctx) 80)
+
+(: tactical-advantage-score (-> ScoringContext Number))
+(= (tactical-advantage-score $ctx) 40)
+
+(: survival-chance-score (-> ScoringContext Number))
+(= (survival-chance-score $ctx) 50)
+
+(: health-restore-score (-> ScoringContext Number))
+(= (health-restore-score $ctx) 70)
+
+;; Named anti-goal functions (avoid inline lambdas)
+(: health-critical-check (-> Context Candidate Number))
+(= (health-critical-check $ctx (action-candidate (action berserk-attack $params)))
+   0)  ;; Veto berserk when health critical
+(= (health-critical-check $ctx $other) 1)
+
+(: tactical-risk-penalty (-> Context Candidate Number))
+(= (tactical-risk-penalty $ctx (action-candidate (action berserk-attack $params)))
+   0.2)  ;; Heavy penalty
+(= (tactical-risk-penalty $ctx $other) 1.0)
+
 ;; Create considerations favoring treasure
 (= (s1-considerations)
-   (Cons (consideration treasure-value (lambda ($ctx) 80))  ;; High value
-   (Cons (consideration treasure-proximity (lambda ($ctx) 30))
+   (Cons (consideration treasure-value treasure-value-score)
+   (Cons (consideration treasure-proximity treasure-proximity-score)
    Nil)))
 
 ;; Create discouragements for risk
 (= (s1-discouragements)
-   (Cons (discouragement low-health-risk (lambda ($ctx) 40))
+   (Cons (discouragement low-health-risk low-health-risk-score)
    Nil))
 
 ;; Test WITHOUT metagoals - short-term wins
@@ -98,7 +140,7 @@
                            (scenario-context)))
         ($score-healing (score-decision-v2
                           (goal-candidate (healing-goal))
-                          (Cons (consideration health-need (lambda ($ctx) 60)) Nil)
+                          (Cons (consideration health-need health-need-score) Nil)
                           Nil
                           Nil
                           Nil
@@ -134,7 +176,7 @@
                            (scenario-context)))
         ($score-healing (score-decision-v2
                           (goal-candidate $healing-promoted)
-                          (Cons (consideration health-critical (lambda ($ctx) 60)) Nil)
+                          (Cons (consideration health-critical health-critical-score) Nil)
                           Nil
                           $metagoals
                           Nil
@@ -171,35 +213,22 @@
 
 ;; High utility for attack
 (= (s2-attack-considerations)
-   (Cons (consideration enemy-vulnerable (lambda ($ctx) 100))
-   (Cons (consideration potential-victory (lambda ($ctx) 80))
+   (Cons (consideration enemy-vulnerable enemy-vulnerable-score)
+   (Cons (consideration potential-victory potential-victory-score)
    Nil)))
 
 ;; Moderate utility for retreat
 (= (s2-retreat-considerations)
-   (Cons (consideration tactical-advantage (lambda ($ctx) 40))
-   (Cons (consideration survival-chance (lambda ($ctx) 50))
+   (Cons (consideration tactical-advantage tactical-advantage-score)
+   (Cons (consideration survival-chance survival-chance-score)
    Nil)))
 
 ;; Custom anti-goals for this scenario
 (= (health-critical-antigoal)
-   (anti-goal health-critical Hard
-     (lambda ($ctx $candidate)
-       (case $candidate
-         (((action-candidate (action berserk-attack $params))
-           0)  ;; Veto berserk when health critical
-          ($other 1))))))
+   (anti-goal health-critical Hard health-critical-check))
 
 (= (tactical-risk-antigoal)
-   (anti-goal tactical-risk Soft
-     (lambda ($ctx $candidate)
-       (case $candidate
-         (((action-candidate (action $name $params))
-           (if (== $name berserk-attack)
-               0.2  ;; Heavy penalty
-               (if (== $name tactical-retreat)
-                   1.0  ;; No penalty
-                   0.8)))))))  ;; Moderate penalty for others
+   (anti-goal tactical-risk Soft tactical-risk-penalty))
 
 ;; Test hard constraint veto
 !(println! "Testing hard anti-goal veto:")

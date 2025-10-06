@@ -53,19 +53,29 @@
      (log-entry $scenario-id $ts $score $mg $ag $plan $status $latency $notes)
      (log-entry $scenario-id $ts $score $mg $ag $plan $status $latency $notes)))
 
+;; Helper for removing a single log entry (named function, not lambda)
+(: remove-log-entry (-> EthicalLogEntry ()))
+(= (remove-log-entry $entry)
+   (remove-atom &ethical-log $entry))
+
 ;; Clear log for a scenario
 (: clear-scenario-log (-> Symbol ()))
 (= (clear-scenario-log $scenario-id)
    (let $entries (get-scenario-log $scenario-id)
-     (map-atom $entries
-       (lambda $entry (remove-atom &ethical-log $entry)))))
+     (clear-entries $entries)))
+
+;; Clear entries using fold (avoid mutation in map-atom lambda)
+(: clear-entries (-> (List EthicalLogEntry) ()))
+(= (clear-entries Nil) ())
+(= (clear-entries (Cons $entry $tail))
+   (let (_ (remove-log-entry $entry))
+     (clear-entries $tail)))
 
 ;; Clear all logs
 (: clear-all-logs (-> ()))
 (= (clear-all-logs)
    (let $all-entries (match &ethical-log $entry $entry)
-     (map-atom $all-entries
-       (lambda $entry (remove-atom &ethical-log $entry)))))
+     (clear-entries $all-entries)))
 
 ;; =============================================================================
 ;; Helper Functions for Scenario Execution

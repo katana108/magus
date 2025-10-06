@@ -34,16 +34,30 @@
      (test-modulators)
      1000))
 
+;; Named consideration functions (avoid inline lambdas)
+(: opportunity-score (-> ScoringContext Number))
+(= (opportunity-score $ctx) 30)
+
+(: proximity-score (-> ScoringContext Number))
+(= (proximity-score $ctx) 20)
+
+;; Named discouragement functions
+(: danger-score (-> ScoringContext Number))
+(= (danger-score $ctx) 10)
+
+(: fatigue-score (-> ScoringContext Number))
+(= (fatigue-score $ctx) 5)
+
 ;; Test considerations
 (= (test-considerations)
-   (Cons (consideration opportunity (lambda ($ctx) 30))
-   (Cons (consideration proximity (lambda ($ctx) 20))
+   (Cons (consideration opportunity opportunity-score)
+   (Cons (consideration proximity proximity-score)
    Nil)))
 
 ;; Test discouragements
 (= (test-discouragements)
-   (Cons (discouragement danger (lambda ($ctx) 10))
-   (Cons (discouragement fatigue (lambda ($ctx) 5))
+   (Cons (discouragement danger danger-score)
+   (Cons (discouragement fatigue fatigue-score)
    Nil)))
 
 ;; Test candidates
