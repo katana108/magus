@@ -6,10 +6,10 @@
 
 ; Load M2 modules first
 !(println "Loading M2 Measurability...")
-!(import! &self Milestone_2/goal-fitness-metrics/measurability/initial_measurability_calculation.metta)
+!(load Milestone_2/goal-fitness-metrics/measurability/initial_measurability_calculation.metta)
 
 !(println "Loading M2 Correlation...")
-!(import! &self Milestone_2/goal-fitness-metrics/correlation/initial_correlation_calculation.metta)
+!(load Milestone_2/goal-fitness-metrics/correlation/initial_correlation_calculation.metta)
 
 !(println "")
 !(println "Testing M2 functions directly:")
@@ -21,7 +21,7 @@
 
 !(println "")
 !(println "Now loading M3 metagoals...")
-!(import! &self Milestone_3/core/metagoals.metta)
+!(load Milestone_3/core/metagoals.metta)
 
 !(println "")
 !(println "Testing M3 helper functions:")

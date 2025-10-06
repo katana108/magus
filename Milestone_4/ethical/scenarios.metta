@@ -3,16 +3,16 @@
 ;; Implements ES1: scenario schema with structured fields
 
 ;; Import core types
-!(import! &self ../../types.metta)
+!(load ../../types.metta)
 
 ;; =============================================================================
 ;; Scenario Schema ADT
 ;; =============================================================================
 
-;; Context represents environmental and agent state
-(: Context Type)
-(: context (-> Symbol Symbol Symbol (List (Tuple Symbol $a)) Context))
-;; context(location, agent-state, environment-danger, additional-properties)
+;; ScenarioContext represents environmental and agent state (renamed to avoid clash with core Context)
+(: ScenarioContext Type)
+(: scenario-context (-> Symbol Symbol Symbol (List (Tuple Symbol $a)) ScenarioContext))
+;; scenario-context(location, agent-state, environment-danger, additional-properties)
 
 ;; SuccessMetric represents a boolean evaluation criterion
 (: SuccessMetric Type)
@@ -32,7 +32,7 @@
     String                          ;; description
     (List Symbol)                   ;; tags
     Symbol                          ;; risk-level (low/medium/high)
-    Context                         ;; context
+    ScenarioContext                 ;; context
     (List Goal)                     ;; goals
     (List AntiGoal)                 ;; anti-goals (hard and soft)
     (List SuccessMetric)            ;; success-metrics
@@ -104,8 +104,8 @@
 (: scenario-risk-level (-> EthicalScenario Symbol))
 (= (scenario-risk-level (scenario $_ $_ $_ $risk $_ $_ $_ $_ $_ $_)) $risk)
 
-(: scenario-context (-> EthicalScenario Context))
-(= (scenario-context (scenario $_ $_ $_ $_ $ctx $_ $_ $_ $_ $_)) $ctx)
+(: get-scenario-context (-> EthicalScenario ScenarioContext))
+(= (get-scenario-context (scenario $_ $_ $_ $_ $ctx $_ $_ $_ $_ $_)) $ctx)
 
 (: scenario-goals (-> EthicalScenario (List Goal)))
 (= (scenario-goals (scenario $_ $_ $_ $_ $_ $goals $_ $_ $_ $_)) $goals)
@@ -123,27 +123,27 @@
 (= (scenario-remediation-hint (scenario $_ $_ $_ $_ $_ $_ $_ $_ $_ $hint)) $hint)
 
 ;; =============================================================================
-;; Context Accessors
+;; ScenarioContext Accessors
 ;; =============================================================================
 
-(: context-location (-> Context Symbol))
-(= (context-location (context $loc $_ $_ $_)) $loc)
+(: scenario-context-location (-> ScenarioContext Symbol))
+(= (scenario-context-location (scenario-context $loc $_ $_ $_)) $loc)
 
-(: context-agent-state (-> Context Symbol))
-(= (context-agent-state (context $_ $state $_ $_)) $state)
+(: scenario-context-agent-state (-> ScenarioContext Symbol))
+(= (scenario-context-agent-state (scenario-context $_ $state $_ $_)) $state)
 
-(: context-danger-level (-> Context Symbol))
-(= (context-danger-level (context $_ $_ $danger $_)) $danger)
+(: scenario-context-danger-level (-> ScenarioContext Symbol))
+(= (scenario-context-danger-level (scenario-context $_ $_ $danger $_)) $danger)
 
-(: context-properties (-> Context (List (Tuple Symbol $a))))
-(= (context-properties (context $_ $_ $_ $props)) $props)
+(: scenario-context-properties (-> ScenarioContext (List (Tuple Symbol $a))))
+(= (scenario-context-properties (scenario-context $_ $_ $_ $props)) $props)
 
-;; Get specific property from context
-(: get-context-property (-> Context Symbol $a))
-(= (get-context-property (context $_ $_ $_ $props) $key)
+;; Get specific property from scenario context
+(: get-scenario-context-property (-> ScenarioContext Symbol $a))
+(= (get-scenario-context-property (scenario-context $_ $_ $_ $props) $key)
    (match $props
      (Cons (Tuple $key $value) $_) $value
-     (Cons $_ $tail) (get-context-property (context _ _ _ $tail) $key)
+     (Cons $_ $tail) (get-scenario-context-property (scenario-context _ _ _ $tail) $key)
      Nil Empty))
 
 ;; =============================================================================
@@ -205,9 +205,9 @@
                   (and (not (== $metrics Nil))
                        (not (== $plan Nil)))))))
 
-;; Validate context has required fields
-(: validate-context (-> Context Bool))
-(= (validate-context (context $loc $state $danger $_))
+;; Validate scenario context has required fields
+(: validate-scenario-context (-> ScenarioContext Bool))
+(= (validate-scenario-context (scenario-context $loc $state $danger $_))
    (and (not (== $loc Empty))
         (and (not (== $state Empty))
              (not (== $danger Empty)))))

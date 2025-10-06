@@ -3,9 +3,9 @@
 ;; Tests explainability and score breakdowns
 ;; Based on Milestone-3-Spec.md Test Requirements
 
-!(import! &self ../core/scoring-v2.metta)
-!(import! &self ../core/metagoals.metta)
-!(import! &self ../core/antigoals.metta)
+!(load ../core/scoring-v2.metta)
+!(load ../core/metagoals.metta)
+!(load ../core/antigoals.metta)
 
 ;; =============================================================================
 ;; Test Data Setup

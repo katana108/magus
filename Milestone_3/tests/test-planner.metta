@@ -2,8 +2,8 @@
 ;; Tests planning, feasibility checking, and AIRIS output generation
 ;; Based on Milestone-3-Spec.md Test Requirements
 
-!(import! &self ../core/planner-bt.metta)
-!(import! &self ../core/antigoals.metta)
+!(load ../core/planner-bt.metta)
+!(load ../core/antigoals.metta)
 
 ;; =============================================================================
 ;; Test Data Setup
