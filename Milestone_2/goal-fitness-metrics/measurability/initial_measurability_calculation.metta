@@ -44,21 +44,20 @@
 
 ; Calculate confidence based on goal characteristics
 ; This function provides the foundation for future adaptive confidence calculation
-(= (calculate-confidence $goal)
-   (cond 
-     ((== $goal energy) 
-      ; Energy has good data sources: battery level, sleep tracking, activity monitoring
-      ; High sample frequency, objective measurements, low noise
-      0.8)
-     ((== $goal exploration)
-      ; Exploration has moderate data: location tracking, activity logs  
-      ; Regular sampling but some subjective interpretation needed
-      0.7)
-     ((== $goal affinity)
-      ; Affinity has limited data: interaction frequency, self-reported satisfaction
-      ; Sparse sampling, highly subjective, theory of mind challenges
-      0.5)
-     (otherwise 0.0)))
+; Energy has good data sources: battery level, sleep tracking, activity monitoring
+; High sample frequency, objective measurements, low noise
+(= (calculate-confidence energy) 0.8)
+
+; Exploration has moderate data: location tracking, activity logs
+; Regular sampling but some subjective interpretation needed
+(= (calculate-confidence exploration) 0.7)
+
+; Affinity has limited data: interaction frequency, self-reported satisfaction
+; Sparse sampling, highly subjective, theory of mind challenges
+(= (calculate-confidence affinity) 0.5)
+
+; Default case for unknown goals
+(= (calculate-confidence $_) 0.0)
 
 ; ================================================================================
 ; CLARITY CALCULATION FUNCTIONS
@@ -70,21 +69,20 @@
 
 ; Calculate clarity based on goal definition precision
 ; This function provides the foundation for future adaptive clarity calculation
-(= (calculate-clarity $goal)
-   (cond
-     ((== $goal energy)
-      ; Energy metrics are highly objective: battery %, sleep hours, activity levels
-      ; Clear thresholds, quantifiable measurements, minimal ambiguity
-      0.9)
-     ((== $goal exploration)  
-      ; Exploration metrics are mostly clear: locations visited, new activities
-      ; Some ambiguity in defining "new" vs "repeated" but generally quantifiable
-      0.8)
-     ((== $goal affinity)
-      ; Affinity metrics are inherently vague: relationship quality, connection depth
-      ; Highly subjective, difficult boundaries, requires theory of mind
-      0.4)
-     (otherwise 0.0)))
+; Energy metrics are highly objective: battery %, sleep hours, activity levels
+; Clear thresholds, quantifiable measurements, minimal ambiguity
+(= (calculate-clarity energy) 0.9)
+
+; Exploration metrics are mostly clear: locations visited, new activities
+; Some ambiguity in defining "new" vs "repeated" but generally quantifiable
+(= (calculate-clarity exploration) 0.8)
+
+; Affinity metrics are inherently vague: relationship quality, connection depth
+; Highly subjective, difficult boundaries, requires theory of mind
+(= (calculate-clarity affinity) 0.4)
+
+; Default case for unknown goals
+(= (calculate-clarity $_) 0.0)
 
 ; ================================================================================
 ; MEASURABILITY CALCULATION FUNCTIONS  
