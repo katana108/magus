@@ -120,13 +120,6 @@
 ;; Ablation-Aware Wrappers
 ;; =============================================================================
 
-;; Apply metagoals only if enabled
-(: apply-metagoals-ablation (-> (List Goal) Context (List Goal)))
-(= (apply-metagoals-ablation $goals $context)
-   (if (get-ablation metagoals-enabled)
-       (apply-metagoals-to-context $goals $context)
-       $goals))  ;; Pass through unchanged if disabled
-
 ;; Apply anti-goals only if enabled
 (: apply-antigoals-ablation (-> (List AntiGoal) (List Candidate) (List Candidate)))
 (= (apply-antigoals-ablation $antigoals $candidates)
@@ -135,11 +128,18 @@
        $candidates))  ;; Pass through unchanged if disabled
 
 ;; Use planner only if enabled
-(: generate-candidates-ablation (-> (List Goal) Context (List Candidate)))
+(: generate-candidates-ablation (-> (List Goal) ScoringContext (List Candidate)))
 (= (generate-candidates-ablation $goals $context)
    (if (get-ablation planner-enabled)
        (generate-candidates $goals $context)
        (generate-candidates-simple $goals)))  ;; Use simple generator if disabled
+
+;; Simple candidate generator (without planner)
+(: generate-candidates-simple (-> (List Goal) (List Candidate)))
+(= (generate-candidates-simple Nil) Nil)
+(= (generate-candidates-simple (Cons $goal $tail))
+   (Cons (goal-candidate $goal)
+         (generate-candidates-simple $tail)))
 
 ;; Use correlation only if enabled
 (: get-correlation-ablation (-> Symbol Symbol Number))
@@ -160,30 +160,34 @@
 ;; =============================================================================
 
 ;; Run scenario with current ablation configuration
-(: run-scenario-ablated (-> Symbol Context (List Goal) (List AntiGoal) $result))
-(= (run-scenario-ablated $scenario-id $context $goals $antigoals)
+(: run-scenario-ablated (-> Symbol ScenarioContext (List Goal) (List AntiGoal) (List Metagoal) $result))
+(= (run-scenario-ablated $scenario-id $scenario-ctx $goals $antigoals $metagoals)
    (let* ((start-time (get-timestamp-ms))
-          ;; Apply metagoals (if enabled)
-          ($adjusted-goals (apply-metagoals-ablation $goals $context))
+          ;; Create ScoringContext from scenario context
+          ($scoring-ctx (create-scoring-context-from-scenario $scenario-ctx $goals))
           ;; Generate candidates (planner if enabled)
-          ($candidates (generate-candidates-ablation $adjusted-goals $context))
+          ($candidates (generate-candidates-ablation $goals $scoring-ctx))
           ;; Apply anti-goals (if enabled)
           ($vetted-candidates (apply-antigoals-ablation $antigoals $candidates))
-          ;; Score and select
-          ($scored (score-all-v2 $vetted-candidates $adjusted-goals $antigoals))
-          ($best (select-best-candidate $scored))
-          ;; Extract contributions
-          ($metagoal-breakdown (extract-metagoal-contributions $adjusted-goals $goals))
-          ($antigoal-breakdown (extract-antigoal-contributions $antigoals $candidates $vetted-candidates))
-          ;; Calculate metrics
-          ($final-score (candidate-score $best))
+          ;; Get active metagoals based on ablation
+          ($active-metagoals (if (get-ablation metagoals-enabled) $metagoals Nil))
+          ($active-antigoals (if (get-ablation antigoals-enabled) $antigoals Nil))
+          ;; Score with M3 pipeline
+          ($scored (score-all-v2 $vetted-candidates $goals $active-antigoals $active-metagoals $scoring-ctx))
+          ;; Select best
+          ((Tuple $best $best-score) (select-best-candidate $scored))
+          ;; Extract DecisionScore components
+          ((decision-score $base $meta-adj $anti-penalty $final) $best-score)
+          ;; Create breakdown tuples
+          ($metagoal-breakdown (list (Tuple metagoal-adjustment $meta-adj)))
+          ($antigoal-breakdown (list (Tuple antigoal-penalty $anti-penalty)))
           (end-time (get-timestamp-ms))
           ($latency (- end-time start-time)))
      ;; Log the decision
      (trace-ethical-step
        $scenario-id
        1
-       $final-score
+       $final
        $metagoal-breakdown
        $antigoal-breakdown
        $best
@@ -191,7 +195,7 @@
        $latency
        (get-ablation-description))
      ;; Return result
-     (tuple $best $final-score $metagoal-breakdown $antigoal-breakdown)))
+     (tuple $best $final $metagoal-breakdown $antigoal-breakdown)))
 
 ;; =============================================================================
 ;; Ablation Description
@@ -237,10 +241,15 @@
 (= (run-ablation-study-configs $scenario-id (Cons $config-name $tail))
    (let* (($ (apply-config $config-name))
           ($scenario (get-scenario $scenario-id))
-          ($context (scenario-context $scenario))
+          ($scenario-ctx (get-scenario-context $scenario))
           ($goals (scenario-goals $scenario))
           ($antigoals (scenario-antigoals $scenario))
-          ($result (run-scenario-ablated $scenario-id $context $goals $antigoals)))
+          ;; Default metagoals for ablation studies
+          ($metagoals (Cons (metagoal coherence)
+                      (Cons (metagoal efficiency)
+                      (Cons (metagoal learning)
+                      Nil))))
+          ($result (run-scenario-ablated $scenario-id $scenario-ctx $goals $antigoals $metagoals)))
      (Cons $result
            (run-ablation-study-configs $scenario-id $tail))))
 

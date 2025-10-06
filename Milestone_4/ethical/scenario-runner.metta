@@ -81,15 +81,8 @@
 ;; Helper Functions for Scenario Execution
 ;; =============================================================================
 
-;; Apply metagoals to adjust goal priorities/weights
-(: apply-metagoals-to-context (-> (List Goal) Context (List Goal)))
-(= (apply-metagoals-to-context $goals $context)
-   ;; For now, return goals unchanged - metagoals are applied during scoring
-   ;; TODO: Connect to M3 metagoal evaluation when fully integrated
-   $goals)
-
-;; Generate candidates from goals and context
-(: generate-candidates (-> (List Goal) Context (List Candidate)))
+;; Generate candidates from goals and scoring context
+(: generate-candidates (-> (List Goal) ScoringContext (List Candidate)))
 (= (generate-candidates Nil $context) Nil)
 (= (generate-candidates (Cons $goal $tail) $context)
    (Cons (goal-candidate $goal)
@@ -119,103 +112,144 @@
 (= (is-safe-candidate (Cons $_ $tail) $cand)
    (is-safe-candidate $tail $cand))
 
-;; Score all candidates with v2 scoring
-(: score-all-v2 (-> (List Candidate) (List Goal) (List AntiGoal) (List (Tuple Candidate Number))))
-(= (score-all-v2 Nil $goals $antigoals) Nil)
-(= (score-all-v2 (Cons $cand $tail) $goals $antigoals)
-   (let $score (simple-candidate-score $cand $goals $antigoals)
+;; Score all candidates with M3's score-decision-v2 pipeline
+(: score-all-v2 (-> (List Candidate)
+                    (List Goal)
+                    (List AntiGoal)
+                    (List Metagoal)
+                    ScoringContext
+                    (List (Tuple Candidate DecisionScore))))
+(= (score-all-v2 Nil $goals $antigoals $metagoals $context) Nil)
+(= (score-all-v2 (Cons $cand $tail) $goals $antigoals $metagoals $context)
+   (let* (;; Define considerations and discouragements for this scenario
+          ($considerations (scenario-considerations $cand $goals))
+          ($discouragements (scenario-discouragements $cand))
+          ;; Use M3's score-decision-v2
+          ($score (score-decision-v2 $cand $considerations $discouragements
+                                     $metagoals $antigoals $context)))
      (Cons (Tuple $cand $score)
-           (score-all-v2 $tail $goals $antigoals))))
+           (score-all-v2 $tail $goals $antigoals $metagoals $context))))
 
-(: simple-candidate-score (-> Candidate (List Goal) (List AntiGoal) Number))
-(= (simple-candidate-score (goal-candidate (goal $name $priority $weight)) $goals $antigoals)
-   (* $priority $weight))
-(= (simple-candidate-score (action-candidate $action) $goals $antigoals)
-   0.5)  ;; Default score
+;; Define considerations for ethical scenarios
+(: scenario-considerations (-> Candidate (List Goal) (List Consideration)))
+(= (scenario-considerations $cand $goals)
+   (Cons (consideration goal-alignment
+                       (lambda $ctx (goal-alignment-score $cand $goals)))
+   (Cons (consideration ethical-value
+                       (lambda $ctx (ethical-value-score $cand)))
+   Nil)))
 
-;; Select best candidate from scored list
-(: select-best-candidate (-> (List (Tuple Candidate Number)) Candidate))
-(= (select-best-candidate Nil) (goal-candidate (goal unknown 0.0 0.0)))
-(= (select-best-candidate (Cons (Tuple $cand $score) Nil)) $cand)
+;; Score how well candidate aligns with goals
+(: goal-alignment-score (-> Candidate (List Goal) Number))
+(= (goal-alignment-score (goal-candidate $goal) $goals)
+   (* 50 (goal-priority $goal)))  ;; Base score from goal priority
+(= (goal-alignment-score (action-candidate $action) $goals)
+   25)  ;; Default for actions
+
+;; Score ethical value of candidate
+(: ethical-value-score (-> Candidate Number))
+(= (ethical-value-score (goal-candidate (goal $name $p $w)))
+   (* 30 $w))  ;; Base score from goal weight
+(= (ethical-value-score (action-candidate $action))
+   20)  ;; Default for actions
+
+;; Define discouragements for ethical scenarios
+(: scenario-discouragements (-> Candidate (List Discouragement)))
+(= (scenario-discouragements $cand)
+   (Cons (discouragement ethical-risk
+                        (lambda $ctx (ethical-risk-score $cand)))
+   Nil))
+
+;; Score ethical risk of candidate
+(: ethical-risk-score (-> Candidate Number))
+(= (ethical-risk-score (goal-candidate $goal))
+   5)  ;; Low baseline risk for goals
+(= (ethical-risk-score (action-candidate $action))
+   10)  ;; Slightly higher risk for actions
+
+;; Select best candidate from scored list (with DecisionScore)
+(: select-best-candidate (-> (List (Tuple Candidate DecisionScore)) (Tuple Candidate DecisionScore)))
+(= (select-best-candidate Nil)
+   (Tuple (goal-candidate (goal unknown 0.0 0.0))
+          (decision-score 0 0 0 0)))
+(= (select-best-candidate (Cons (Tuple $cand $score) Nil))
+   (Tuple $cand $score))
 (= (select-best-candidate (Cons (Tuple $c1 $s1) (Cons (Tuple $c2 $s2) $tail)))
-   (if (> $s1 $s2)
+   (if (> (extract-final-score $s1) (extract-final-score $s2))
        (select-best-candidate (Cons (Tuple $c1 $s1) $tail))
        (select-best-candidate (Cons (Tuple $c2 $s2) $tail))))
 
-;; Extract score from a candidate
-(: candidate-score (-> Candidate Number))
-(= (candidate-score (goal-candidate (goal $name $priority $weight)))
-   (* $priority $weight))
-(= (candidate-score (action-candidate $action))
-   0.5)
+;; Extract final score from DecisionScore
+(: extract-final-score (-> DecisionScore Number))
+(= (extract-final-score (decision-score $base $meta $anti $final))
+   $final)
 
 ;; =============================================================================
 ;; Scenario Execution
 ;; =============================================================================
 
 ;; Execute a scenario and return the result
-(: run-scenario (-> Symbol Context (List Goal) (List AntiGoal) $result))
-(= (run-scenario $scenario-id $context $goals $antigoals)
+(: run-scenario (-> Symbol ScenarioContext (List Goal) (List AntiGoal) (List Metagoal) $result))
+(= (run-scenario $scenario-id $scenario-ctx $goals $antigoals $metagoals)
    (let* ((start-time (get-timestamp-ms))
-          ;; Promote/demote goals based on metagoals
-          ($adjusted-goals (apply-metagoals-to-context $goals $context))
+          ;; Create ScoringContext from scenario context
+          ($scoring-ctx (create-scoring-context-from-scenario $scenario-ctx $goals))
           ;; Apply anti-goal constraints
-          ($candidates (generate-candidates $adjusted-goals $context))
+          ($candidates (generate-candidates $goals $scoring-ctx))
           ($vetted-candidates (apply-anti-goals $antigoals $candidates))
-          ;; Score remaining candidates
-          ($scored (score-all-v2 $vetted-candidates $adjusted-goals $antigoals))
+          ;; Score remaining candidates with M3 pipeline
+          ($scored (score-all-v2 $vetted-candidates $goals $antigoals $metagoals $scoring-ctx))
           ;; Select best action
-          ($best (select-best-candidate $scored))
-          ;; Extract metagoal and anti-goal contributions
-          ($metagoal-breakdown (extract-metagoal-contributions $adjusted-goals $goals))
-          ($antigoal-breakdown (extract-antigoal-contributions $antigoals $candidates $vetted-candidates))
-          ;; Calculate metrics
-          ($final-score (candidate-score $best))
+          ((Tuple $best $best-score) (select-best-candidate $scored))
+          ;; Extract DecisionScore components
+          ((decision-score $base $meta-adj $anti-penalty $final) $best-score)
+          ;; Create breakdown tuples
+          ($metagoal-breakdown (list (Tuple metagoal-adjustment $meta-adj)))
+          ($antigoal-breakdown (list (Tuple antigoal-penalty $anti-penalty)))
           (end-time (get-timestamp-ms))
           ($latency (- end-time start-time)))
      ;; Log the decision
      (trace-ethical-step
        $scenario-id
        1
-       $final-score
+       $final
        $metagoal-breakdown
        $antigoal-breakdown
        $best
        pending
        $latency
-       "Scenario execution completed")
+       "Scenario execution with M3 scoring completed")
      ;; Return result
-     (tuple $best $final-score $metagoal-breakdown $antigoal-breakdown)))
+     (tuple $best $final $metagoal-breakdown $antigoal-breakdown)))
 
-;; =============================================================================
-;; Metagoal Contribution Extraction
-;; =============================================================================
+;; Create ScoringContext from ScenarioContext
+(: create-scoring-context-from-scenario (-> ScenarioContext (List Goal) ScoringContext))
+(= (create-scoring-context-from-scenario $scenario-ctx $goals)
+   (let* (;; Extract danger level to create modulators
+          ($danger (scenario-context-danger-level $scenario-ctx))
+          ($modulators (danger-to-modulators $danger)))
+     ;; Create ScoringContext with goals, modulators, and timestamp
+     (scoring-context $goals $modulators (get-timestamp-ms))))
 
-;; Extract metagoal contributions by comparing before/after
-(: extract-metagoal-contributions (-> (List Goal) (List Goal) (List (Tuple Symbol Number))))
-(= (extract-metagoal-contributions $adjusted $original)
-   (extract-metagoal-changes $adjusted $original Nil))
+;; Convert danger level to modulators
+(: danger-to-modulators (-> Symbol (List Modulator)))
+(= (danger-to-modulators low)
+   (Cons (modulator arousal 0.3)
+   (Cons (modulator focus 0.4)
+   Nil)))
+(= (danger-to-modulators medium)
+   (Cons (modulator arousal 0.6)
+   (Cons (modulator focus 0.7)
+   Nil)))
+(= (danger-to-modulators high)
+   (Cons (modulator arousal 0.9)
+   (Cons (modulator focus 1.0)
+   Nil)))
+(= (danger-to-modulators $_)  ;; Default
+   (Cons (modulator arousal 0.5)
+   (Cons (modulator focus 0.5)
+   Nil)))
 
-;; Helper to calculate changes
-(: extract-metagoal-changes (-> (List Goal) (List Goal) (List (Tuple Symbol Number)) (List (Tuple Symbol Number))))
-(= (extract-metagoal-changes Nil $_ $acc) $acc)
-(= (extract-metagoal-changes (Cons $adj-goal $adj-tail) $original $acc)
-   (let* (($name (goal-name $adj-goal))
-          ($adj-weight (goal-weight $adj-goal))
-          ($orig-weight (find-goal-weight $name $original))
-          ($delta (- $adj-weight $orig-weight))
-          ($new-acc (if (> (abs $delta) 0.01)
-                        (Cons (Tuple $name $delta) $acc)
-                        $acc)))
-     (extract-metagoal-changes $adj-tail $original $new-acc)))
-
-;; Find original weight for a goal
-(: find-goal-weight (-> Symbol (List Goal) Number))
-(= (find-goal-weight $name Nil) 1.0)
-(= (find-goal-weight $name (Cons $goal $tail))
-   (if (== (goal-name $goal) $name)
-       (goal-weight $goal)
-       (find-goal-weight $name $tail)))
 
 ;; =============================================================================
 ;; Anti-goal Contribution Extraction
@@ -258,21 +292,6 @@
 (: get-timestamp-ms (-> Number))
 (= (get-timestamp-ms) 0.0)  ;; TODO: Implement actual timestamp
 
-;; =============================================================================
-;; Candidate Generation (Placeholder)
-;; =============================================================================
-
-;; Generate candidates from goals and context
-(: generate-candidates (-> (List Goal) Context (List Candidate)))
-(= (generate-candidates $goals $context)
-   ;; Placeholder: should use planner-bt.metta
-   (generate-candidates-simple $goals))
-
-(: generate-candidates-simple (-> (List Goal) (List Candidate)))
-(= (generate-candidates-simple Nil) Nil)
-(= (generate-candidates-simple (Cons $goal $tail))
-   (Cons (candidate (goal-name $goal) (list) 1.0 Nil)
-         (generate-candidates-simple $tail)))
 
 ;; =============================================================================
 ;; Scenario Assertion (ES5)
