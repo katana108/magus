@@ -2,7 +2,7 @@
 
 **Date:** October 2025
 **Scope:** M2, M3, M4 implementations
-**Reference:** `metta-best-practices.md`
+**Status:** ✅ **RESOLVED** (All 7 Codex issues fixed, 100% tests passing)
 
 ---
 
@@ -14,6 +14,159 @@ Analysis of M2/M3/M4 code against MeTTa best practices reveals:
 - 🔴 **Critical:** Several evaluation issues due to Hyperon 0.2.1 limitations with `let`
 
 **Recommendation:** Focus on simplifying `let`/`match` patterns and adding complete type signatures
+
+---
+
+## ⚠️ TOP 5 ANTI-PATTERNS - MOST VIOLATED RULES
+
+Based on comprehensive technical debt pass, these were the most common issues:
+
+### 1. 🔴 Inline Lambdas (MOST FREQUENT - 15+ violations)
+
+**Why This Matters:** Causes evaluation failures in Hyperon 0.2.1
+
+**Bad Pattern:**
+```metta
+(= (test-considerations)
+   (Cons (consideration opportunity (lambda ($ctx) 30))
+   (Cons (consideration proximity (lambda ($ctx) 20))
+   Nil)))
+```
+
+**Good Pattern:**
+```metta
+(: opportunity-score (-> ScoringContext Number))
+(= (opportunity-score $ctx) 30)
+
+(: proximity-score (-> ScoringContext Number))
+(= (proximity-score $ctx) 20)
+
+(= (test-considerations)
+   (Cons (consideration opportunity opportunity-score)
+   (Cons (consideration proximity proximity-score)
+   Nil)))
+```
+
+**Prevention:** `grep -r "lambda" *.metta` before committing
+
+---
+
+### 2. 🔴 let/match Pattern (MOST SUBTLE - 6+ bugs)
+
+**Why This Matters:** Returns unevaluated expressions, hard to debug
+
+**Bad Pattern:**
+```metta
+(= (get-base-energy-cost $action)
+   (let $result (match &energy-costs
+                   (action-energy-cost $action $cost $mult)
+                   $cost)
+     (if (== $result Empty)
+         (default-energy-cost)
+         $result)))
+;; Returns: [(let $result ...)] - BROKEN!
+```
+
+**Good Pattern:**
+```metta
+;; Helper extracts value via pattern matching
+(: extract-energy-cost (-> $a Number))
+(= (extract-energy-cost Empty) (default-energy-cost))
+(= (extract-energy-cost (action-energy-cost $_ $cost $_)) $cost)
+
+;; Main function calls helper
+(= (get-base-energy-cost $action)
+   (extract-energy-cost
+     (match &energy-costs
+       (action-energy-cost $action $cost $mult)
+       (action-energy-cost $action $cost $mult))))
+```
+
+**Prevention:** Never use `let` with `match` - use equality-based dispatch
+
+---
+
+### 3. 🔴 Atomspace Mutation in Lambdas (HARD TO DETECT)
+
+**Why This Matters:** Violates functional purity, causes race conditions
+
+**Bad Pattern:**
+```metta
+(= (clear-scenario-log $scenario-id)
+   (let $entries (get-scenario-log $scenario-id)
+     (map-atom $entries
+       (lambda $entry (remove-atom &ethical-log $entry)))))
+```
+
+**Good Pattern:**
+```metta
+;; Named function for mutation
+(: remove-log-entry (-> EthicalLogEntry ()))
+(= (remove-log-entry $entry)
+   (remove-atom &ethical-log $entry))
+
+;; Recursive pattern instead of map-atom
+(: clear-entries (-> (List EthicalLogEntry) ()))
+(= (clear-entries Nil) ())
+(= (clear-entries (Cons $entry $tail))
+   (let (_ (remove-log-entry $entry))
+     (clear-entries $tail)))
+```
+
+**Prevention:** Review all `map-atom`/`filter-atom` with lambdas
+
+---
+
+### 4. ⚠️ Missing Type Signatures (55% → 73% coverage needed)
+
+**Why This Matters:** Reduces code clarity, misses type errors
+
+**Bad Pattern:**
+```metta
+(= (novelty-score $goal $context) 0.2)  ;; No type signature
+```
+
+**Good Pattern:**
+```metta
+(: novelty-score (-> Goal Context Number))
+(= (novelty-score $goal $context)
+   (let $measurability (get-measurability (goal-name $goal))
+     (* (- 1.0 $measurability) 0.4)))
+```
+
+**Prevention:** Add signatures immediately when writing functions
+
+---
+
+### 5. ⚠️ Placeholder Constants (Data Not Flowing)
+
+**Why This Matters:** Breaks integration, creates stale stubs
+
+**Bad Pattern:**
+```metta
+(= (novelty-score $goal $context) 0.2)  ;; Hardcoded!
+```
+
+**Good Pattern:**
+```metta
+(= (novelty-score $goal $context)
+   (let $measurability (get-measurability (goal-name $goal))
+     (* (- 1.0 $measurability) 0.4)))  ;; Uses M2 data
+```
+
+**Prevention:** Mark TODOs prominently, connect data early
+
+---
+
+## CRITICAL RULES FOR ALL METTA CODE
+
+These rules were violated most often and cause the most severe bugs:
+
+1. ❌ **NEVER use inline lambdas** - Always define named functions
+2. ❌ **NEVER use `let` with `match`** - Use equality-based dispatch
+3. ❌ **NEVER mutate atomspace in lambdas** - Use explicit recursion
+4. ✅ **ALWAYS add type signatures** - Documents intent, catches errors
+5. ✅ **ALWAYS connect data** - Replace placeholders with real calculations
 
 ---
 

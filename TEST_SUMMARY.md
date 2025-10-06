@@ -150,6 +150,76 @@
 - CLAUDE_REVIEW_NOTES.md addressed
 - All commits include detailed explanations
 
+## Lessons Learned
+
+### Most Common Issues Encountered
+
+1. **Inline Lambdas (Issue #4)** - Most frequent violation
+   - **Problem**: 15+ instances across test files
+   - **Pattern**: `(lambda ($x) ...)` in consideration/discouragement definitions
+   - **Fix**: Always use named functions with type signatures
+   - **Lesson**: **Inline lambdas cause evaluation issues in Hyperon 0.2.1**
+   - **Prevention**: Use linter/grep to detect `lambda` keyword before committing
+
+2. **let/match Evaluation Issues** - Most subtle bugs
+   - **Problem**: 6 functions returning unevaluated expressions
+   - **Pattern**: `(let $result (match ...) (if (== $result Empty) ...))`
+   - **Fix**: Equality-based dispatch with helper functions
+   - **Lesson**: **match returns list, let expects single value - incompatible**
+   - **Prevention**: Avoid `let` with `match`, use pattern matching directly
+
+3. **Atomspace Mutation in Lambdas (Issue #7)** - Hard to detect
+   - **Problem**: `(map-atom $list (lambda ($x) (remove-atom ...)))`
+   - **Pattern**: Side effects inside lambda passed to higher-order functions
+   - **Fix**: Recursive pattern with named mutation function
+   - **Lesson**: **Lambda should be pure, use explicit recursion for side effects**
+   - **Prevention**: Review all `map-atom`/`filter-atom` with lambdas
+
+4. **Missing Type Signatures** - Reduced code clarity
+   - **Problem**: Only 55% coverage initially
+   - **Pattern**: Helper functions without `(: name (-> ...))`
+   - **Fix**: Systematic review and addition of 70+ signatures
+   - **Lesson**: **Type signatures are documentation and catch errors early**
+   - **Prevention**: Add signatures immediately when writing functions
+
+5. **Placeholder Constants (Issue #5)** - Data not flowing
+   - **Problem**: M3 metagoals using hardcoded 0.2, 0.1 instead of M2 data
+   - **Pattern**: `(= (novelty-score $goal $ctx) 0.2)` when M2 provides real values
+   - **Fix**: Connect to M2 `get-measurability` function
+   - **Lesson**: **Always wire up data dependencies, don't use stubs long-term**
+   - **Prevention**: Mark TODOs prominently and track in issue tracker
+
+### Key Takeaways for Future Development
+
+**Critical Rules (Violated Most Often)**:
+1. ❌ **NEVER use inline lambdas** - Always define named functions
+2. ❌ **NEVER use `let` with `match`** - Use equality-based dispatch
+3. ❌ **NEVER mutate atomspace in lambdas** - Use explicit recursion
+4. ✅ **ALWAYS add type signatures** - Helps catch bugs and documents intent
+5. ✅ **ALWAYS connect data** - Replace placeholders with real calculations
+
+**Testing Discipline**:
+- Run tests immediately in target environment (WSL for Hyperon)
+- Use proper assertions (`assert`, not just `print`)
+- Test edge cases (Empty, Nil, unknown values)
+- Verify integration points (M2→M3, M3→M4)
+
+**Code Review Checklist**:
+- [ ] No inline lambdas (grep for `lambda`)
+- [ ] No `let` with `match` patterns
+- [ ] No atomspace mutation in lambdas
+- [ ] All functions have type signatures
+- [ ] All TODOs have tracking issues
+- [ ] Tests pass in WSL environment
+
+### Process Improvements Applied
+
+1. **Comprehensive Analysis First**: Created TECHNICAL-DEBT-ANALYSIS.md before fixes
+2. **Systematic Execution**: Fixed issues in logical order (imports → helpers → types → lambdas)
+3. **Verification at Each Step**: Ran tests after each category of fixes
+4. **Detailed Commit Messages**: Explained rationale, patterns, and examples
+5. **Final Validation**: Comprehensive test suite before declaring completion
+
 ## Summary
 
 All M2, M3, and M4 tests passing. All 7 Codex review issues resolved.
@@ -160,3 +230,6 @@ reproducibility work.
 **Pass Rate**: 100% (31/31)
 **Known Limitations**: Documented with workarounds
 **Code Quality**: High (best practices compliant)
+
+**Lessons Learned**: 5 major anti-patterns identified and documented
+**Process**: Systematic debt reduction with verification at each step
