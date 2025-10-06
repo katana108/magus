@@ -157,9 +157,9 @@ M4 Ethical Scenarios (Validation)
 ## Documentation
 
 ### Core Documentation
-- **[TEST_SUMMARY.md](TEST_SUMMARY.md)** - Comprehensive test results & lessons learned
+- **[TEST_SUMMARY.md](TEST_SUMMARY.md)** - Comprehensive test results
 - **[M2-M3-COMPLETION-REPORT.md](M2-M3-COMPLETION-REPORT.md)** - M2/M3 final status
-- **[TECHNICAL-DEBT-ANALYSIS.md](TECHNICAL-DEBT-ANALYSIS.md)** - Best practices & anti-patterns
+- **[MAGUS-Best-Practices.md](../../magi-knowledge-repo/docs/neoterics/MAGUS/MAGUS-Best-Practices.md)** - Consolidated best practices & anti-patterns (knowledge repo)
 
 ### Implementation Guides
 - **[Milestone_3/docs/Antigoal-Cost-Implementation.md](Milestone_3/docs/Antigoal-Cost-Implementation.md)** - M3 cost system details
