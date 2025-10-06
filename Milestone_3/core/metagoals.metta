@@ -177,9 +177,14 @@
    (Cons (learning-helper $goal $context)
          (learning-adjustments $tail $context)))
 
-;; Calculate novelty score
+;; Calculate novelty score based on measurability
+;; Low measurability suggests novel/unexplored goals worth pursuing
 (: novelty-score (-> Goal Context Number))
-(= (novelty-score $goal $context) 0.2)  ;; Placeholder
+(= (novelty-score $goal $context)
+   (let $measurability (get-measurability (goal-name $goal))
+     ;; Invert measurability: novel goals have low measurability
+     ;; Scale to [0, 0.4] range for adjustment magnitude
+     (* (- 1.0 $measurability) 0.4)))
 
 ;; Helper for uncertainty calculation
 (: uncertainty-helper (-> Goal Context WeightAdjustment))
@@ -193,9 +198,16 @@
    (Cons (uncertainty-helper $goal $context)
          (uncertainty-adjustments $tail $context)))
 
-;; Calculate uncertainty reduction value
+;; Calculate uncertainty reduction value based on measurability
+;; Goals with very low measurability (<0.3) are high-uncertainty targets
 (: uncertainty-value (-> Goal Context Number))
-(= (uncertainty-value $goal $context) 0.1)  ;; Placeholder
+(= (uncertainty-value $goal $context)
+   (let $measurability (get-measurability (goal-name $goal))
+     ;; Boost goals with very low measurability (high uncertainty)
+     ;; Use threshold-based approach: significant boost below 0.3
+     (if (< $measurability 0.3)
+         0.3  ;; Strong boost for uncertain goals
+         0.0)))  ;; No boost for well-understood goals
 
 ;; =============================================================================
 ;; Promotion and Demotion Logic with Hysteresis
