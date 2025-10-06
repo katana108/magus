@@ -138,7 +138,7 @@
 ;; Test default tree (fallback)
 !(let (($tree (build-behavior-tree (default-goal) (test-world-state))))
   (case $tree
-    (((Action $name $params)
+    (((BTAction $name $params)
       (assertEqualToResult
         (== $name wait)
         (True))))))
@@ -150,15 +150,15 @@
 !(println! "Test 5: Action Extraction from Trees")
 
 ;; Test extracting from simple action
-!(let (($actions (extract-actions (Action move (a b)))))
+!(let (($actions (extract-actions (BTAction move (a b)))))
   (assertEqualToResult
     (length $actions)
     (1)))
 
 ;; Test extracting from sequence
 !(let* (($seq (Sequence
-                (Cons (Action move (a b))
-                (Cons (Action pickup (item loc))
+                (Cons (BTAction move (a b))
+                (Cons (BTAction pickup (item loc))
                 Nil))))
         ($actions (extract-actions $seq)))
   (assertEqualToResult
@@ -168,7 +168,7 @@
 ;; Test extracting from selector (first viable)
 !(let* (($sel (Selector
                 (Cons (Condition has-item)  ;; Skipped
-                (Cons (Action move (a b))
+                (Cons (BTAction move (a b))
                 Nil))))
         ($actions (extract-actions $sel)))
   (assertEqualToResult
@@ -206,15 +206,15 @@
 
 ;; Test feasible plan
 !(let* (($simple-plan (plan (movement-goal)
-                           (Cons (Action wait ()) Nil)
+                           (Cons (BTAction wait Nil) Nil)
                            50)))
   (assertEqualToResult
     (is-plan-feasible $simple-plan (test-world-state))
     (True)))
 
 ;; Test action sequence checking
-!(let (($sequence (Cons (Action move (current-location target-location))
-                  (Cons (Action wait ())
+!(let (($sequence (Cons (BTAction move (Cons current-location (Cons target-location Nil)))
+                  (Cons (BTAction wait Nil)
                   Nil))))
   (assertEqualToResult
     (check-action-sequence $sequence (test-world-state))
@@ -228,7 +228,7 @@
 
 ;; Test repairing infeasible plan
 !(let* (($infeasible-plan (plan (combat-goal)
-                               (Cons (Action use (weapon target)) Nil)
+                               (Cons (BTAction use (Cons weapon (Cons target Nil))) Nil)
                                75))
         ($repaired (repair-plan $infeasible-plan (empty-world-state))))
   (case $repaired
@@ -245,8 +245,8 @@
 
 ;; Test converting plan to AIRIS tuples
 !(let* (($plan (plan (movement-goal)
-                    (Cons (Action move (a b))
-                    (Cons (Action wait ())
+                    (Cons (BTAction move (Cons a (Cons b Nil)))
+                    (Cons (BTAction wait Nil)
                     Nil))
                     80))
         ($tuples (plan-to-airis-tuple $plan)))
@@ -256,12 +256,12 @@
 
 ;; Test AIRIS action formatting
 !(assertEqualToResult
-  (format-airis-action (Action explore (area-x)))
+  (format-airis-action (BTAction explore (Cons area-x Nil)))
   ((explore (area-x))))
 
 ;; Test complete AIRIS output
 !(let* (($plan (plan (exploration-goal)
-                    (Cons (Action explore (unknown-area)) Nil)
+                    (Cons (BTAction explore (Cons unknown-area Nil)) Nil)
                     60))
         ($output (create-airis-output $plan)))
   (assertEqualToResult
@@ -323,7 +323,7 @@
     (((plan $goal $actions $score)
       (assertEqualToResult
         (case $actions
-          (((Cons (Action wait ()) Nil) True)
+          (((Cons (BTAction wait Nil) Nil) True)
            ($other False)))
         (True))))))  ;; Should default to wait
 
