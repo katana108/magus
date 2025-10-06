@@ -3,11 +3,11 @@
 ;; Implements ES2: scenario loader and ES4: logging pipeline
 
 ;; Import dependencies
-!(import! &self scenarios.metta)
-!(import! &self ../Milestone_3/core/metagoals.metta)
-!(import! &self ../Milestone_3/core/antigoals.metta)
-!(import! &self ../Milestone_3/core/scoring-v2.metta)
-!(import! &self ../Milestone_3/core/planner-bt.metta)
+!(load scenarios.metta)
+!(load ../Milestone_3/core/metagoals.metta)
+!(load ../Milestone_3/core/antigoals.metta)
+!(load ../Milestone_3/core/scoring-v2.metta)
+!(load ../Milestone_3/core/planner-bt.metta)
 
 ;; =============================================================================
 ;; Ethical Logging Pipeline
@@ -66,6 +66,78 @@
    (let $all-entries (match &ethical-log $entry $entry)
      (map-atom $all-entries
        (lambda $entry (remove-atom &ethical-log $entry)))))
+
+;; =============================================================================
+;; Helper Functions for Scenario Execution
+;; =============================================================================
+
+;; Apply metagoals to adjust goal priorities/weights
+(: apply-metagoals-to-context (-> (List Goal) Context (List Goal)))
+(= (apply-metagoals-to-context $goals $context)
+   ;; For now, return goals unchanged - metagoals are applied during scoring
+   ;; TODO: Connect to M3 metagoal evaluation when fully integrated
+   $goals)
+
+;; Generate candidates from goals and context
+(: generate-candidates (-> (List Goal) Context (List Candidate)))
+(= (generate-candidates Nil $context) Nil)
+(= (generate-candidates (Cons $goal $tail) $context)
+   (Cons (goal-candidate $goal)
+         (generate-candidates $tail $context)))
+
+;; Apply anti-goals to filter candidates (list variant)
+(: apply-anti-goals (-> (List AntiGoal) (List Candidate) (List Candidate)))
+(= (apply-anti-goals $antigoals $candidates)
+   ;; Filter out candidates that violate hard constraints
+   (filter-safe-candidates $antigoals $candidates))
+
+(: filter-safe-candidates (-> (List AntiGoal) (List Candidate) (List Candidate)))
+(= (filter-safe-candidates $antigoals Nil) Nil)
+(= (filter-safe-candidates $antigoals (Cons $cand $tail))
+   (if (is-safe-candidate $antigoals $cand)
+       (Cons $cand (filter-safe-candidates $antigoals $tail))
+       (filter-safe-candidates $antigoals $tail)))
+
+(: is-safe-candidate (-> (List AntiGoal) Candidate Bool))
+(= (is-safe-candidate Nil $cand) True)
+(= (is-safe-candidate (Cons (anti-goal $name Hard $fn) $tail) $cand)
+   ;; Hard constraints must pass (penalty != 0 means veto)
+   (let $penalty ($fn (context Nil 0) $cand)
+     (if (== $penalty 0)
+         False  ;; Vetoed
+         (is-safe-candidate $tail $cand))))
+(= (is-safe-candidate (Cons $_ $tail) $cand)
+   (is-safe-candidate $tail $cand))
+
+;; Score all candidates with v2 scoring
+(: score-all-v2 (-> (List Candidate) (List Goal) (List AntiGoal) (List (Tuple Candidate Number))))
+(= (score-all-v2 Nil $goals $antigoals) Nil)
+(= (score-all-v2 (Cons $cand $tail) $goals $antigoals)
+   (let $score (simple-candidate-score $cand $goals $antigoals)
+     (Cons (Tuple $cand $score)
+           (score-all-v2 $tail $goals $antigoals))))
+
+(: simple-candidate-score (-> Candidate (List Goal) (List AntiGoal) Number))
+(= (simple-candidate-score (goal-candidate (goal $name $priority $weight)) $goals $antigoals)
+   (* $priority $weight))
+(= (simple-candidate-score (action-candidate $action) $goals $antigoals)
+   0.5)  ;; Default score
+
+;; Select best candidate from scored list
+(: select-best-candidate (-> (List (Tuple Candidate Number)) Candidate))
+(= (select-best-candidate Nil) (goal-candidate (goal unknown 0.0 0.0)))
+(= (select-best-candidate (Cons (Tuple $cand $score) Nil)) $cand)
+(= (select-best-candidate (Cons (Tuple $c1 $s1) (Cons (Tuple $c2 $s2) $tail)))
+   (if (> $s1 $s2)
+       (select-best-candidate (Cons (Tuple $c1 $s1) $tail))
+       (select-best-candidate (Cons (Tuple $c2 $s2) $tail))))
+
+;; Extract score from a candidate
+(: candidate-score (-> Candidate Number))
+(= (candidate-score (goal-candidate (goal $name $priority $weight)))
+   (* $priority $weight))
+(= (candidate-score (action-candidate $action))
+   0.5)
 
 ;; =============================================================================
 ;; Scenario Execution

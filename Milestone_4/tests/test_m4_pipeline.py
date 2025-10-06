@@ -59,12 +59,10 @@ def test_scenario_schema():
     # Test scenario retrieval
     print("\n--- Testing Scenario Retrieval ---")
     result = metta.run('!(scenario-id (get-scenario test-simple))')
-    if result:
-        print(f"SUCCESS: Retrieved scenario: {result[0]}")
-        return True
-    else:
-        print(f"FAIL: Could not retrieve scenario")
-        return False
+    assert result, "FAIL: Could not retrieve scenario"
+    assert 'test-simple' in str(result[0]), f"FAIL: Expected 'test-simple', got {result[0]}"
+    print(f"SUCCESS: Retrieved scenario: {result[0]}")
+    return True
 
 def test_ethical_logging():
     """Test ethical logging pipeline"""
@@ -110,12 +108,10 @@ def test_ethical_logging():
     # Test log retrieval
     print("\n--- Testing Log Retrieval ---")
     result = metta.run('!(get-scenario-log test-logging)')
-    if result:
-        print(f"SUCCESS: Retrieved log entries: {len(result)} entries")
-        return True
-    else:
-        print(f"FAIL: Could not retrieve log")
-        return False
+    assert result, "FAIL: Could not retrieve log"
+    assert len(result) > 0, "FAIL: Log should contain entries"
+    print(f"SUCCESS: Retrieved log entries: {len(result)} entries")
+    return True
 
 def test_metrics_collection():
     """Test metrics collection framework"""
@@ -199,20 +195,17 @@ def test_ablation_framework():
     metta.run('!(set-ablation metagoals-enabled False)')
 
     result = metta.run('!(get-ablation metagoals-enabled)')
-    if result and 'False' in str(result[0]):
-        print(f"SUCCESS: Ablation flag set to False: {result[0]}")
-    else:
-        print(f"WARNING: Unexpected ablation result: {result}")
+    assert result, "FAIL: No result from get-ablation"
+    assert 'False' in str(result[0]), f"FAIL: Expected False, got {result[0]}"
+    print(f"SUCCESS: Ablation flag set to False: {result[0]}")
 
     # Test reset
     metta.run('!(reset-ablations)')
     result = metta.run('!(get-ablation metagoals-enabled)')
-    if result and 'True' in str(result[0]):
-        print(f"SUCCESS: Ablation reset to True: {result[0]}")
-        return True
-    else:
-        print(f"WARNING: Unexpected reset result: {result}")
-        return False
+    assert result, "FAIL: No result from get-ablation after reset"
+    assert 'True' in str(result[0]), f"FAIL: Expected True after reset, got {result[0]}"
+    print(f"SUCCESS: Ablation reset to True: {result[0]}")
+    return True
 
 def test_integration_modules():
     """Test AIRIS and HERMES integration modules load"""

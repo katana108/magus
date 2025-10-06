@@ -8,8 +8,8 @@
 
 ;; Import M2 metrics
 ;; Load from relative path to Milestone_2
-!(import! &self ../../Milestone_2/goal-fitness-metrics/measurability/initial_measurability_calculation.metta)
-!(import! &self ../../Milestone_2/goal-fitness-metrics/correlation/initial_correlation_calculation.metta)
+!(load ../../Milestone_2/goal-fitness-metrics/measurability/initial_measurability_calculation.metta)
+!(load ../../Milestone_2/goal-fitness-metrics/correlation/initial_correlation_calculation.metta)
 
 ;; =============================================================================
 ;; Metagoal-specific Functions

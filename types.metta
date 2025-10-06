@@ -3,9 +3,13 @@
 ;; All modules should import this file to ensure type consistency
 
 ;; =============================================================================
-;; List ADT and Utilities
+;; Basic ADTs
 ;; =============================================================================
 
+;; Tuple for pairs
+(: Tuple (-> $a $b Type))
+
+;; List ADT
 (: List (-> $a Type))
 (: Nil (List $a))
 (: Cons (-> $a (List $a) (List $a)))
