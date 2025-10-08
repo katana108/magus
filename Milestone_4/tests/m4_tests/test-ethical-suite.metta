@@ -18,7 +18,7 @@
       "Test scenario description"
       (list safety testing)
       medium
-      (context lab normal safe Nil)
+      (scenario-context lab normal safe Nil)
       (list (goal test-goal 0.8 1.0))
       (list (hard-antigoal no-harm 0.0))
       (list (metric-boolean no-hard-violations True))
@@ -42,13 +42,13 @@
 
 ;; Test context creation and accessors
 !(assertEqual
-  (let $ctx (context laboratory normal hostile (list (Tuple resources 100)))
-    (context-location $ctx))
+  (let $ctx (scenario-context laboratory normal hostile (list (Tuple resources 100)))
+    (scenario-context-location $ctx))
   (laboratory))
 
 !(assertEqual
-  (let $ctx (context laboratory normal hostile (list (Tuple resources 100)))
-    (context-danger-level $ctx))
+  (let $ctx (scenario-context laboratory normal hostile (list (Tuple resources 100)))
+    (scenario-context-danger-level $ctx))
   (hostile))
 
 ;; =============================================================================
@@ -176,7 +176,7 @@
       "Safety tag test"
       (list safety)
       high
-      (context lab normal safe Nil)
+      (scenario-context lab normal safe Nil)
       (list (goal test-goal 0.8 1.0))
       Nil
       (list (metric-boolean no-hard-violations True))
