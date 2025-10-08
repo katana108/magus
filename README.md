@@ -9,7 +9,7 @@ All milestones implemented and validated:
 - **M3**: Metagoals, Anti-goals, Scoring v2, Planner - Fully integrated with M2
 - **M4**: Ethical Evaluation Framework - 10 scenarios, 5/5 pipeline tests passing
 
-**Total: 31/31 tests passing (100%)**
+**Total: 24/24 Python tests passing (100%)** | **Validated in WSL Ubuntu environment**
 
 ## Overview
 
@@ -26,7 +26,9 @@ Built in MeTTa language (Hyperon 0.2.1) with comprehensive test coverage and bes
 
 ### Prerequisites
 - Python 3.12+ with MeTTa/Hyperon installed
-- WSL environment (for running tests)
+- **WSL Ubuntu environment required on Windows** - Hyperon 0.2.1 is installed with Linux binaries
+
+**Important**: On Windows, all tests must be run in WSL, not Git Bash or PowerShell. The virtual environment contains Linux shared objects (.so files) that require a Linux runtime.
 
 ### Installation
 ```bash
@@ -39,17 +41,30 @@ pip install hyperon
 ```
 
 ### Running Tests
+
+**All tests must run in WSL on Windows systems**:
+
 ```bash
-# In WSL
-cd neoterics/metta-magus
+# Quick run - automated test script
+wsl bash run_all_tests_wsl.sh
+
+# Or run individually from WSL:
+wsl
+
+# Navigate to project (adjust path as needed)
+cd /mnt/e/GitLab/the-smithy1/magi/neoterics/metta-magus
+
+# Activate virtual environment
 source .venv/bin/activate
 
-# M2 tests
-python Milestone_2/goal-fitness-metrics/measurability/test_measurability.py
-python Milestone_2/goal-fitness-metrics/correlation/test_correlations.py
+# M2 tests (19 tests)
+python Milestone_2/goal-fitness-metrics/measurability/test_measurability.py  # 12 tests
+python Milestone_2/goal-fitness-metrics/correlation/test_correlations.py     # 7 tests
 
-# M4 pipeline tests
+# M4 pipeline tests (5 tests)
 python Milestone_4/tests/test_m4_pipeline.py
+
+# Expected: 24/24 tests passing
 ```
 
 ## Milestones Completed
@@ -177,10 +192,10 @@ M4 Ethical Scenarios (Validation)
 - ✅ Type signatures for all functions (73% M3, 81% M4 coverage)
 - ✅ Data-driven (M2 metrics connected to M3 metagoals)
 
-**Test Coverage**: 31/31 tests (100% pass rate)
+**Test Coverage**: 24/24 Python tests (100% pass rate) - Validated in WSL
 - M2 Measurability: 12/12
 - M2 Correlation: 7/7
-- M3 Integration: Verified
+- M3 Integration: Code analysis verified, Python tests cover functionality
 - M4 Pipeline: 5/5
 
 **Performance**: Within 25% regression budget (M3 requirement)
