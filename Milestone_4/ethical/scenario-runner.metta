@@ -4,10 +4,15 @@
 
 ;; Import dependencies
 !(load scenarios.metta)
-!(load ../Milestone_3/core/metagoals.metta)
-!(load ../Milestone_3/core/antigoals.metta)
-!(load ../Milestone_3/core/scoring-v2.metta)
-!(load ../Milestone_3/core/planner-bt.metta)
+!(load ../../Milestone_3/core/metagoals.metta)
+!(load ../../Milestone_3/core/antigoals.metta)
+!(load ../../Milestone_3/core/scoring-v2.metta)
+!(load ../../Milestone_3/core/planner-bt.metta)
+
+;; Boolean AND helper for logical operations
+(: and (-> Bool Bool Bool))
+(= (and True True) True)
+(= (and $_ $_) False)
 
 ;; =============================================================================
 ;; Ethical Logging Pipeline

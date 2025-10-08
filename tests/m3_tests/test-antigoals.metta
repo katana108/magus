@@ -2,7 +2,7 @@
 ;; Tests hard/soft constraints, multiplicative discouragement, and violations
 ;; Based on Milestone-3-Spec.md Test Requirements
 
-!(import! &self ../../antigoals)
+!(load ../../Milestone_3/core/antigoals.metta)
 
 ;; =============================================================================
 ;; Test Data Setup

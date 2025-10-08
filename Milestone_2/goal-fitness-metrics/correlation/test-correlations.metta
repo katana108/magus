@@ -1,7 +1,7 @@
 ; Test file for MIC correlation functions
 ; Load the main implementation first
 
-!(include "initial-correlation-calculation.metta")
+!(include "initial_correlation_calculation.metta")
 
 ; Test individual correlation retrieval
 !(println "=== Individual Correlation Tests ===")

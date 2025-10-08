@@ -66,7 +66,7 @@ reproducibility-archive/
 ├── INSTALL.md ✅ (Comprehensive setup guide)
 ├── environment/
 │   ├── setup.sh ✅
-│   └── requirements.txt (needs creation - see below)
+│   └── requirements.txt ✅
 ├── tests/
 │   ├── run_all_tests.sh ✅
 │   └── expected_results.md ✅ (Updated)
@@ -131,27 +131,17 @@ reproducibility-archive/
 
 ### For Complete Polish:
 
-1. **Create requirements.txt** (~5 minutes)
-   - Location: `Milestone_4/reproducibility-archive/environment/requirements.txt`
-   - Contents:
-     ```
-     hyperon==0.2.1
-     pytest==8.0.0
-     pyyaml==6.0
-     numpy==1.26.0
-     ```
-
-2. **Add CHANGELOG.md to archive** (~10 minutes)
+1. **Add CHANGELOG.md to archive** (~10 minutes)
    - Document Codex fixes chronologically
    - Include commit hashes for traceability
 
-3. **Verify all scripts are executable** (~5 minutes)
+2. **Verify all scripts are executable** (~5 minutes)
    ```bash
    chmod +x environment/setup.sh
    chmod +x tests/run_all_tests.sh
    ```
 
-**Total Time**: ~20 minutes
+**Total Time**: ~15 minutes
 
 ### Nice-to-Have Enhancements:
 
@@ -199,7 +189,7 @@ reproducibility-archive/
 - [x] Claims aligned with D4
 - [x] Codex fixes documented
 - [x] Scripts present
-- [ ] requirements.txt created (medium priority)
+- [x] requirements.txt created
 - [ ] Scripts executable permissions set (medium priority)
 
 ---
@@ -236,9 +226,8 @@ Distribution options:
 Both deliverables are complete and ready. No blocking issues.
 
 ### Before Submission (Highly Recommended)
-1. Create requirements.txt (~5 min) - **Do this**
-2. Set script permissions (~5 min) - **Do this**
-3. Test setup.sh on fresh system (if possible)
+1. Set script permissions (~5 min) - **Do this**
+2. Test setup.sh on fresh system (if possible)
 
 ### Before Distribution (Optional)
 1. Add CHANGELOG.md

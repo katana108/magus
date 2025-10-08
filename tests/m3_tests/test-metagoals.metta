@@ -2,7 +2,7 @@
 ;; Tests metrics windowing, promotion/demotion, and metagoal adjustments
 ;; Based on Milestone-3-Spec.md Test Requirements
 
-!(import! &self ../../metagoals)
+!(load ../../Milestone_3/core/metagoals.metta)
 
 ;; =============================================================================
 ;; Test Data Setup

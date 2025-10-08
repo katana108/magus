@@ -2,8 +2,8 @@
 ;; Tests bidirectional mapping, mode detection, and round-trip conversion
 ;; Based on Milestone-3-Spec.md Test Requirements
 
-!(import! &self ../../integration-airis)
-!(import! &self ../../planner-bt)
+!(load ../../Milestone_3/core/integration-airis.metta)
+!(load ../../Milestone_3/core/planner-bt.metta)
 
 ;; =============================================================================
 ;; Test Data Setup

@@ -2,12 +2,12 @@
 ;; Tests complete workflows as described in Milestone-3-Spec.md
 ;; Scenarios: S1 (metagoal refinement), S2 (anti-goal guardrails), S3 (planning)
 
-!(import! &self ../../metagoals)
-!(import! &self ../../antigoals)
-!(import! &self ../../scoring-v2)
-!(import! &self ../../planner-bt)
-!(import! &self ../../integration-airis)
-!(import! &self ../../hermes-refs)
+!(load ../../Milestone_3/core/metagoals.metta)
+!(load ../../Milestone_3/core/antigoals.metta)
+!(load ../../Milestone_3/core/scoring-v2.metta)
+!(load ../../Milestone_3/core/planner-bt.metta)
+!(load ../../Milestone_3/core/integration-airis.metta)
+!(load ../../Milestone_3/core/hermes-refs.metta)
 
 ;; =============================================================================
 ;; Scenario Setup
