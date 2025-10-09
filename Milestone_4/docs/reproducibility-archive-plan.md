@@ -367,7 +367,7 @@ python m4_pipeline/test_m4_pipeline.py
 
 echo ""
 echo "=== All Tests Complete ==="
-echo "Expected: 31/31 PASSED"
+echo "Expected: 24/24 Python tests PASSED"
 ```
 
 ### validate_results.py
@@ -583,7 +583,7 @@ zip -r magus-reproducibility-v1.0.zip magus-reproducibility-v1.0/
 - ✅ Archive extracts without errors
 - ✅ setup.sh completes successfully
 - ✅ All dependencies install
-- ✅ run_all_tests.sh shows 31/31 PASSED
+- ✅ run_all_tests.sh shows 24/24 Python tests PASSED
 - ✅ validate_results.py confirms match
 - ✅ generate_report.py creates HTML summary
 - ✅ Documentation is clear and complete

@@ -351,7 +351,7 @@ zip -r magus-reproducibility-v1.0.zip reproducibility-archive/
 - ✅ Archive extracts without errors
 - ✅ setup.sh completes successfully
 - ✅ All dependencies install
-- ✅ run_all_tests.sh shows 31/31 PASSED
+- ✅ run_all_tests.sh shows 24/24 Python tests PASSED
 - ✅ validate_results.py confirms match
 - ✅ generate_report.py creates HTML
 - ✅ Documentation is clear and complete
