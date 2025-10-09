@@ -250,15 +250,15 @@ class TestMeasurabilityCalculations(unittest.TestCase):
         
         for goal1, goal2, base_corr in test_cases:
             weighted_corr = self.calculator.get_weighted_correlation(goal1, goal2, base_corr)
-            
-            # Calculate expected weighted correlation manually
+
+            # Calculate expected weighted correlation manually using geometric mean
             meas1 = self.calculator.get_measurability(goal1)
             meas2 = self.calculator.get_measurability(goal2)
-            avg_meas = (meas1 + meas2) / 2
-            expected_weighted = base_corr * avg_meas
-            
+            geometric_mean = (meas1 * meas2) ** 0.5
+            expected_weighted = base_corr * geometric_mean
+
             print(f"{goal1.value}-{goal2.value}: base={base_corr}, weighted={weighted_corr:.4f}, expected={expected_weighted:.4f}")
-            
+
             self.assertAlmostEqual(weighted_corr, expected_weighted, places=4)
             
             # Weighted correlation should be less than or equal to base correlation

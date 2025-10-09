@@ -281,25 +281,29 @@ class MeasurabilityCalculator:
     def get_weighted_correlation(self, goal1: Goal, goal2: Goal, base_correlation: float) -> float:
         """
         Weight correlation by measurability of both goals.
-        
+
         Args:
             goal1: First goal in the pair
             goal2: Second goal in the pair
             base_correlation: Base correlation value to weight
-            
+
         Returns:
-            Correlation weighted by average measurability of the goal pair
-            
+            Correlation weighted by geometric mean of measurability of the goal pair
+
         Educational Note:
         Weighting correlations by measurability adjusts correlation strength based
         on how reliably we can measure both goals. If either goal has low measurability,
         the effective correlation is reduced because we're less confident in the relationship.
+
+        We use the geometric mean (sqrt(m1 × m2)) rather than arithmetic mean because
+        it better represents mutual synergy - if either goal has very low measurability,
+        it appropriately reduces confidence in the correlation more than a simple average would.
         """
         measurability1 = self.get_measurability(goal1)
         measurability2 = self.get_measurability(goal2)
-        avg_measurability = (measurability1 + measurability2) / 2
-        
-        return base_correlation * avg_measurability
+        geometric_mean = (measurability1 * measurability2) ** 0.5
+
+        return base_correlation * geometric_mean
 
     def calculate_measurability_weighted_score(self, ee_corr: float, ea_corr: float, ex_corr: float) -> float:
         """

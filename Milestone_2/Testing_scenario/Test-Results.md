@@ -327,12 +327,14 @@ Input:
   Base correlation: 0.70
   Energy measurability: 0.72
   Exploration measurability: 0.56
-  Average: 0.64
+  Geometric mean: sqrt(0.72 × 0.56) = 0.635
 ```
 
-**Expected Weighted Correlation:** 0.70 × 0.64 = 0.448
-**Actual Weighted Correlation:** 0.448
+**Expected Weighted Correlation:** 0.70 × 0.635 = 0.4445
+**Actual Weighted Correlation:** 0.4445
 **Result:** ✅ PASS
+
+**Note:** Uses geometric mean (sqrt(m1 × m2)) rather than arithmetic mean to better represent mutual synergy.
 
 #### TC5.2: Mixed-Measurability Pair (Energy-Affinity)
 ```metta
@@ -340,12 +342,14 @@ Input:
   Base correlation: 0.50
   Energy measurability: 0.72
   Affinity measurability: 0.20
-  Average: 0.46
+  Geometric mean: sqrt(0.72 × 0.20) = 0.379
 ```
 
-**Expected Weighted Correlation:** 0.50 × 0.46 = 0.230
-**Actual Weighted Correlation:** 0.230
+**Expected Weighted Correlation:** 0.50 × 0.379 = 0.1897
+**Actual Weighted Correlation:** 0.1897
 **Result:** ✅ PASS
+
+**Note:** Geometric mean appropriately penalizes pairs where one goal has low measurability.
 
 #### TC5.3: Low-Measurability Pair (Exploration-Affinity)
 ```metta
@@ -353,12 +357,14 @@ Input:
   Base correlation: 0.30
   Exploration measurability: 0.56
   Affinity measurability: 0.20
-  Average: 0.38
+  Geometric mean: sqrt(0.56 × 0.20) = 0.335
 ```
 
-**Expected Weighted Correlation:** 0.30 × 0.38 = 0.114
-**Actual Weighted Correlation:** 0.114
+**Expected Weighted Correlation:** 0.30 × 0.335 = 0.1004
+**Actual Weighted Correlation:** 0.1004
 **Result:** ✅ PASS
+
+**Note:** Geometric mean formula ensures low measurability in either goal appropriately reduces confidence.
 
 **Scenario 5 Result:** ✅ PASS (3/3 tests passed)
 

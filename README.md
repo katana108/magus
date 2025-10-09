@@ -40,6 +40,23 @@ source .venv/bin/activate  # or .venv/Scripts/activate on Windows
 pip install hyperon
 ```
 
+### Using MeTTa Directly
+
+When running MeTTa code directly (outside of Python tests), use `magus_init.py` for proper initialization:
+
+```python
+from hyperon import MeTTa
+from magus_init import initialize_magus
+
+metta = MeTTa()
+initialize_magus(metta)  # Registers grounded math functions (sqrt, pow, abs, etc.)
+
+# Now load your MeTTa files
+metta.run("!(import! &self Milestone_3/core/scoring-v2.metta)")
+```
+
+**Important**: The `initialize_magus()` function registers 9 essential grounded Python functions (sqrt, pow, abs, floor, ceil, sin, cos, log, exp) that are required by MAGUS calculations. Without this initialization, math operations will fail.
+
 ### Running Tests
 
 **All tests must run in WSL on Windows systems**:
