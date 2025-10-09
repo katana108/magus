@@ -135,11 +135,13 @@
 ; ================================================================================
 
 ; Weight correlation by measurability of both goals
+; Uses geometric mean to ensure both goals must be measurable for synergy
+; Formula: weighted_corr = base_corr × sqrt(meas1 × meas2)
 (= (get-weighted-correlation $goal1 $goal2 $base-correlation)
    (let $measurability1 (get-measurability $goal1)
    (let $measurability2 (get-measurability $goal2)
-   (let $avg-measurability (/ (+ $measurability1 $measurability2) 2)
-        (* $base-correlation $avg-measurability)))))
+   (let $gmean-measurability (sqrt (* $measurability1 $measurability2))
+        (* $base-correlation $gmean-measurability)))))
 
 ; Calculate overall measurability-weighted score from correlation values
 (= (calculate-measurability-weighted-score $ee-corr $ea-corr $ex-corr)

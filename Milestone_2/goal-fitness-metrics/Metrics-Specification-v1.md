@@ -171,7 +171,7 @@ Based on synthetic goal satisfaction data designed to match realistic correlatio
 
 **Correlation Integration:**
 - Used with measurability: `promote if measurability ≥ 0.6 AND correlation ≥ 0.7`
-- Weighted by measurability: `effective_correlation = correlation × avg(measurability(G₁), measurability(G₂))`
+- Weighted by measurability: `effective_correlation = correlation × √(measurability(G₁) × measurability(G₂))`
 
 ## 4. Integration Between Metrics
 
@@ -193,8 +193,17 @@ When comparing correlations between goals with different measurability:
 
 ```
 WeightedCorrelation(G₁, G₂) =
-    Correlation(G₁, G₂) × (Measurability(G₁) + Measurability(G₂)) / 2
+    Correlation(G₁, G₂) × √(Measurability(G₁) × Measurability(G₂))
 ```
+
+**Rationale for Geometric Mean**: The geometric mean ensures that **both** goals must have reasonable measurability for the correlation to be trusted. If either goal has very low measurability, the geometric mean will be low, appropriately reducing confidence in the correlation.
+
+**Comparison with Arithmetic Mean**:
+- Arithmetic mean `(m₁ + m₂)/2` is biased toward the higher value
+- Geometric mean `√(m₁ × m₂)` penalizes when either value is low
+- Example: If m₁=0.9 and m₂=0.1:
+  - Arithmetic: (0.9 + 0.1)/2 = 0.5 (seems high despite one very low value)
+  - Geometric: √(0.9 × 0.1) = 0.3 (more conservative, appropriate for synergy)
 
 This ensures we don't over-trust correlations between poorly measurable goals.
 

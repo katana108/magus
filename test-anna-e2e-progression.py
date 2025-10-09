@@ -17,10 +17,13 @@ This test validates the complete MAGUS architecture:
 Based on Anna's feedback in CLAUDE_ANNA_NOTES.md
 """
 
-from hyperon import MeTTa, OperationAtom
+from hyperon import MeTTa
 from pathlib import Path
 import sys
-import math
+
+# Add current directory to path for magus_init
+sys.path.insert(0, str(Path(__file__).parent))
+from magus_init import initialize_magus
 
 def print_section(title):
     """Print formatted section header"""
@@ -35,14 +38,11 @@ def test_anna_e2e_progression():
     """
     print_section("MAGUS E2E PROGRESSION TEST (Anna's Vision)")
 
-    metta = MeTTa()
+    # Initialize MAGUS with grounded math functions
+    print("\n--- Step 0: Initializing MAGUS System ---")
+    metta = initialize_magus()
     base_dir = Path(__file__).parent
-
-    # Register grounded math functions (sqrt, pow) needed for overgoal calculations
-    print("\n--- Step 0: Registering Grounded Math Functions ---")
-    metta.register_atom('sqrt', OperationAtom('sqrt', lambda x: math.sqrt(x), unwrap=True))
-    metta.register_atom('pow', OperationAtom('pow', lambda x, y: math.pow(x, y), unwrap=True))
-    print("  ✓ Registered sqrt and pow as grounded Python functions")
+    print("  ✓ Initialized MAGUS with grounded math functions (sqrt, pow, etc.)")
 
     # =========================================================================
     # Step 1: Load All Modules
