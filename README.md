@@ -197,16 +197,25 @@ M4 Ethical Scenarios (Validation)
 ## Documentation
 
 ### Core Documentation
-- **[TEST_SUMMARY.md](TEST_SUMMARY.md)** - Comprehensive test results
-- **[M2-M3-COMPLETION-REPORT.md](M2-M3-COMPLETION-REPORT.md)** - M2/M3 final status
-- **[MAGUS-Best-Practices.md](../../magi-knowledge-repo/docs/neoterics/MAGUS/MAGUS-Best-Practices.md)** - Consolidated best practices & anti-patterns (knowledge repo)
+- **[README.md](README.md)** - This file - project overview and quick start
+- **[TEST_SUMMARY.md](TEST_SUMMARY.md)** - Current test results (24/24 passing)
+- **[BACH-MODULATORS-FRAMEWORK.md](BACH-MODULATORS-FRAMEWORK.md)** - Bach's 6-modulator framework
+- **[CLAUDE.md](CLAUDE.md)** - Project context for Claude Code
+
+### Latest Status
+- **[CODEX-REVIEW-COMPLETE-FINAL.md](CODEX-REVIEW-COMPLETE-FINAL.md)** - Final Codex review summary (Oct 2025)
+- **[CODEX-FEEDBACK-FIXES-2025-10-09.md](CODEX-FEEDBACK-FIXES-2025-10-09.md)** - Latest feedback fixes
+- **[ANNA-IMPLEMENTATION-COMPLETE.md](ANNA-IMPLEMENTATION-COMPLETE.md)** - Architecture implementation summary
 
 ### Implementation Guides
 - **[Milestone_3/docs/Antigoal-Cost-Implementation.md](Milestone_3/docs/Antigoal-Cost-Implementation.md)** - M3 cost system details
 - **[Milestone_4/docs/ethical-scenarios.md](Milestone_4/docs/ethical-scenarios.md)** - M4 scenario catalog
 
-### Development Guide
-- **[CLAUDE.md](CLAUDE.md)** - Project context for Claude Code
+### Knowledge Repository
+- **[MAGUS-Best-Practices.md](../../magi-knowledge-repo/docs/neoterics/MAGUS/MAGUS-Best-Practices.md)** - Consolidated best practices & anti-patterns
+
+### Historical Documentation
+- **[docs/archive/README.md](docs/archive/README.md)** - Archived documentation index (historical context)
 
 ## Code Quality
 
