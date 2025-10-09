@@ -1023,10 +1023,10 @@ M3 does not have standalone unit tests (integration-focused). Verification achie
 
 #### 4.4.1 Test Coverage Summary
 
-**Total Test Count**: 31
+**Total Test Count**: 24 Python tests (12 M2 measurability, 7 M2 correlation, 5 M4 pipeline)
 - M2 Measurability: 12 tests
 - M2 Correlation: 7 tests
-- M3 Integration: Verified (not unit-tested)
+- M3 Integration: Verified via E2E tests and code analysis (not unit-tested)
 - M4 Pipeline: 5 tests
 - M4 Scenarios: 10 implemented
 
