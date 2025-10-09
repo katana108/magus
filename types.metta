@@ -149,8 +149,8 @@
 
 ;; Decision score breakdown - standardized format
 (: DecisionScore Type)
-(: decision-score (-> Number Number Number Number DecisionScore))
-;; base_utility, metagoal_adjustment, antigoal_penalties, final_score
+(: decision-score (-> Number Number Number Number Number DecisionScore))
+;; base_utility, metagoal_adjustment, overgoal_adjustment, antigoal_penalties, final_score
 
 ;; Score component for explainability
 (: ScoreComponent Type)

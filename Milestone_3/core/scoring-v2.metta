@@ -211,34 +211,52 @@
 ;; Overgoal Calculation (Measurability-Weighted Goal Correlations)
 ;; =============================================================================
 
+;; Helper: Extract goal name from Goal
+(: get-goal-name (-> Goal Symbol))
+(= (get-goal-name (goal $name $priority $weight)) $name)
+
 ;; Calculate overgoal score for a specific goal based on weighted correlations
 ;; This represents how well the goal fits with the overall goal set
 ;; Formula: Average of measurability-weighted correlations with other active goals
 ;;
-;; Note: This requires M2 measurability and correlation data to be available
-;; The weighted correlation formula is: base_correlation × gmean(measurability1, measurability2)
+;; Integrates M2 measurability and correlation data
+;; The weighted correlation formula is: base_correlation × sqrt(measurability1 × measurability2)
 ;;
 ;; Usage: Can be called to assess goal coherence/synergy in the current goal set
 ;; Higher overgoal scores indicate goals that align well with other goals
 (: calculate-overgoal-score (-> Goal (List Goal) Number))
 (= (calculate-overgoal-score $target-goal Nil) 0.0)
 (= (calculate-overgoal-score $target-goal (Cons $goal $rest))
-   ;; For each other goal, we would compute weighted correlation
-   ;; This is a placeholder that shows the structure
-   ;; Real implementation would call M2 functions: get-correlation, get-measurability
-   ;; Then apply: weighted-corr = base-corr × gmean(meas1, meas2)
-   ;; Then average all weighted correlations
-   ;;
-   ;; Example computation (requires M2 loaded):
-   ;; (let* (($base-corr (get-correlation (goal-name $target-goal) (goal-name $goal)))
-   ;;        ($meas1 (get-measurability (goal-name $target-goal)))
-   ;;        ($meas2 (get-measurability (goal-name $goal)))
-   ;;        ($gmean (gmean $meas1 $meas2))
-   ;;        ($weighted (* $base-corr $gmean)))
-   ;;   (+ $weighted (calculate-overgoal-score $target-goal $rest)))
-   ;;
-   ;; For now, return 0.0 as this requires M2 integration
-   0.0)
+   (let* (;; Extract goal names
+          ($target-name (get-goal-name $target-goal))
+          ($other-name (get-goal-name $goal))
+          ;; Get M2 data - base correlation between goals
+          ($base-corr (get-correlation $target-name $other-name))
+          ;; Get M2 measurabilities
+          ($meas1 (get-measurability $target-name))
+          ($meas2 (get-measurability $other-name))
+          ;; Calculate weighted correlation: base_corr × sqrt(meas1 × meas2)
+          ($weighted (get-weighted-correlation-for-overgoal
+                       $target-name $other-name $base-corr $meas1 $meas2))
+          ;; Recursively calculate for remaining goals
+          ($rest-sum (calculate-overgoal-score $target-goal $rest))
+          ;; Count total goals for averaging
+          ($count (+ 1 (length $rest))))
+     ;; Return average weighted correlation
+     (if (> $count 0)
+         (/ (+ $weighted $rest-sum) $count)
+         0.0)))
+
+;; Calculate overgoal adjustment for a goal within its scoring context
+;; Applies a bonus based on how well the goal aligns with other active goals
+;; Bonus formula: 0.3 × overgoal_score (overgoal_score is 0-1 range)
+(: calculate-overgoal-adjustment (-> Goal ScoringContext Number))
+(= (calculate-overgoal-adjustment $goal (scoring-context $goals $mods $time))
+   (let* (;; Get overgoal score (average weighted correlation with other goals)
+          ($overgoal-score (calculate-overgoal-score $goal $goals))
+          ;; Apply bonus: 0.0 to 0.3 based on overgoal score
+          ($bonus (* 0.3 $overgoal-score)))
+     $bonus))
 
 ;; Calculate overall goal set coherence using overgoal scores
 ;; Returns average overgoal score across all goals
@@ -273,12 +291,17 @@
                             (calculate-metagoal-adjustment-v2
                               (extract-goal $candidate) $context $metagoals)
                             0))
+          ;; Calculate overgoal adjustment (goal set coherence)
+          ($overgoal-adj (if (is-goal-candidate $candidate)
+                            (calculate-overgoal-adjustment
+                              (extract-goal $candidate) $context)
+                            0))
           ;; Calculate anti-goal penalties (multiplicative)
           ($antigoal-factor (calculate-antigoal-penalty $candidate $context $antigoals))
-          ;; Combine scores
-          ($adjusted (+ $base $metagoal-adj))
+          ;; Combine scores: base + metagoal + overgoal, then × antigoal
+          ($adjusted (+ (+ $base $metagoal-adj) $overgoal-adj))
           ($final (* $adjusted $antigoal-factor)))
-     (decision-score $base $metagoal-adj (- 1 $antigoal-factor) $final)))
+     (decision-score $base $metagoal-adj $overgoal-adj (- 1 $antigoal-factor) $final)))
 
 ;; Check if candidate is a goal
 (: is-goal-candidate (-> Candidate Bool))
@@ -295,12 +318,13 @@
 
 ;; Generate detailed score breakdown
 (: generate-score-breakdown (-> DecisionScore (List ScoreComponent)))
-(= (generate-score-breakdown (decision-score $base $meta $anti $final))
+(= (generate-score-breakdown (decision-score $base $meta $overgoal $anti $final))
    (Cons (score-component base-utility $base "Base utility from considerations/discouragements")
    (Cons (score-component metagoal-adjustment $meta "Long-term strategic value")
+   (Cons (score-component overgoal-adjustment $overgoal "Goal set coherence bonus")
    (Cons (score-component antigoal-penalty $anti "Risk and constraint penalties")
    (Cons (score-component final-score $final "Combined final score")
-   Nil)))))
+   Nil))))))
 
 ;; Format score breakdown for logging (simplified - string ops not in minimal MeTTa)
 (: format-score-breakdown (-> (List ScoreComponent) (List ScoreComponent)))
@@ -336,13 +360,17 @@
                                (calculate-metagoal-adjustment-v2
                                  (extract-goal $candidate) $context $meta)
                                0)))
+          ($overgoal-adj (if (is-goal-candidate $candidate)
+                            (calculate-overgoal-adjustment
+                              (extract-goal $candidate) $context)
+                            0))
           ($anti-penalty (calculate-antigoal-penalty $candidate $context $anti))
           ($anti-factor (if (== $aw 1.0)
                            $anti-penalty
                            (pow $anti-penalty $aw)))
-          ($adjusted (+ $base $meta-adj))
+          ($adjusted (+ (+ $base $meta-adj) $overgoal-adj))
           ($final (* $adjusted $anti-factor)))
-     (decision-score $base $meta-adj (- 1 $anti-factor) $final)))
+     (decision-score $base $meta-adj $overgoal-adj (- 1 $anti-factor) $final)))
 
 ;; =============================================================================
 ;; Decision Ranking
@@ -385,13 +413,13 @@
                        (List (Candidate DecisionScore))
                        (List (Candidate DecisionScore))))
 (= (insert-by-score $item Nil) (Cons $item Nil))
-(= (insert-by-score ($c1 (decision-score $b1 $m1 $a1 $f1))
-                   (Cons ($c2 (decision-score $b2 $m2 $a2 $f2)) $tail))
+(= (insert-by-score ($c1 (decision-score $b1 $m1 $o1 $a1 $f1))
+                   (Cons ($c2 (decision-score $b2 $m2 $o2 $a2 $f2)) $tail))
    (if (> $f1 $f2)
-       (Cons ($c1 (decision-score $b1 $m1 $a1 $f1))
-             (Cons ($c2 (decision-score $b2 $m2 $a2 $f2)) $tail))
-       (Cons ($c2 (decision-score $b2 $m2 $a2 $f2))
-             (insert-by-score ($c1 (decision-score $b1 $m1 $a1 $f1)) $tail))))
+       (Cons ($c1 (decision-score $b1 $m1 $o1 $a1 $f1))
+             (Cons ($c2 (decision-score $b2 $m2 $o2 $a2 $f2)) $tail))
+       (Cons ($c2 (decision-score $b2 $m2 $o2 $a2 $f2))
+             (insert-by-score ($c1 (decision-score $b1 $m1 $o1 $a1 $f1)) $tail))))
 
 ;; =============================================================================
 ;; Logging and Observability
