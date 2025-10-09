@@ -9,6 +9,7 @@
 ;; Import other modules
 !(load metagoals.metta)
 !(load antigoals.metta)
+!(load overgoal.metta)
 
 ;; =============================================================================
 ;; Additional Types (beyond types.metta)
@@ -53,13 +54,30 @@
    (let (($modulated (* $score (modulator-effect $name $value))))
      (apply-modulators $modulated $tail)))
 
-;; Calculate modulator effect
+;; Calculate modulator effect - Bach's 6-modulator framework
+;; PAD (Pleasure-Arousal-Dominance) + Attentional (Focus, Resolution, Exteroception)
+;; Using knowledge base approach to avoid nondeterminism from catch-all pattern
+
+;; Create modulator knowledge base
+!(bind! &modulator-kb (new-space))
+
+;; Store modulator parameters: (modulator-params name base-value multiplier)
+;; Formula: effect = base + (multiplier × value)
+!(add-atom &modulator-kb (modulator-params arousal 0.8 0.4))       ;; 0.8 to 1.2
+!(add-atom &modulator-kb (modulator-params pleasure 0.9 0.2))      ;; 0.9 to 1.1
+!(add-atom &modulator-kb (modulator-params dominance 0.85 0.3))    ;; 0.85 to 1.15
+!(add-atom &modulator-kb (modulator-params focus 0.7 0.6))         ;; 0.7 to 1.3
+!(add-atom &modulator-kb (modulator-params resolution 0.75 0.5))   ;; 0.75 to 1.25
+!(add-atom &modulator-kb (modulator-params exteroception 0.8 0.4)) ;; 0.8 to 1.2
+
+;; Get modulator effect by looking up parameters
 (: modulator-effect (-> Symbol Number Number))
-(= (modulator-effect arousal $value) (+ 0.8 (* 0.4 $value)))  ;; 0.8 to 1.2
-(= (modulator-effect pleasure $value) (+ 0.9 (* 0.2 $value))) ;; 0.9 to 1.1
-(= (modulator-effect dominance $value) (+ 0.85 (* 0.3 $value))) ;; 0.85 to 1.15
-(= (modulator-effect focus $value) (+ 0.7 (* 0.6 $value)))    ;; 0.7 to 1.3
-(= (modulator-effect $other $value) 1.0)  ;; No effect for unknown
+(= (modulator-effect $name $value)
+   (let $params (match &modulator-kb (modulator-params $name $base $mult) ($base $mult))
+     (if (== $params ())
+         1.0  ;; Default for unknown modulators
+         (let ($base $mult) $params
+           (+ $base (* $mult $value))))))
 
 ;; =============================================================================
 ;; Metagoal Integration
@@ -188,6 +206,51 @@
 (: scoring-to-antigoal-context (-> ScoringContext Context))
 (= (scoring-to-antigoal-context (scoring-context $goals $mods $time))
    (context $goals $time))
+
+;; =============================================================================
+;; Overgoal Calculation (Measurability-Weighted Goal Correlations)
+;; =============================================================================
+
+;; Calculate overgoal score for a specific goal based on weighted correlations
+;; This represents how well the goal fits with the overall goal set
+;; Formula: Average of measurability-weighted correlations with other active goals
+;;
+;; Note: This requires M2 measurability and correlation data to be available
+;; The weighted correlation formula is: base_correlation × gmean(measurability1, measurability2)
+;;
+;; Usage: Can be called to assess goal coherence/synergy in the current goal set
+;; Higher overgoal scores indicate goals that align well with other goals
+(: calculate-overgoal-score (-> Goal (List Goal) Number))
+(= (calculate-overgoal-score $target-goal Nil) 0.0)
+(= (calculate-overgoal-score $target-goal (Cons $goal $rest))
+   ;; For each other goal, we would compute weighted correlation
+   ;; This is a placeholder that shows the structure
+   ;; Real implementation would call M2 functions: get-correlation, get-measurability
+   ;; Then apply: weighted-corr = base-corr × gmean(meas1, meas2)
+   ;; Then average all weighted correlations
+   ;;
+   ;; Example computation (requires M2 loaded):
+   ;; (let* (($base-corr (get-correlation (goal-name $target-goal) (goal-name $goal)))
+   ;;        ($meas1 (get-measurability (goal-name $target-goal)))
+   ;;        ($meas2 (get-measurability (goal-name $goal)))
+   ;;        ($gmean (gmean $meas1 $meas2))
+   ;;        ($weighted (* $base-corr $gmean)))
+   ;;   (+ $weighted (calculate-overgoal-score $target-goal $rest)))
+   ;;
+   ;; For now, return 0.0 as this requires M2 integration
+   0.0)
+
+;; Calculate overall goal set coherence using overgoal scores
+;; Returns average overgoal score across all goals
+(: calculate-goalset-coherence (-> (List Goal) Number))
+(= (calculate-goalset-coherence Nil) 0.0)
+(= (calculate-goalset-coherence (Cons $goal $rest))
+   (let* (($count (+ 1 (length $rest)))
+          ($total (+ (calculate-overgoal-score $goal $rest)
+                     (* $count (calculate-goalset-coherence $rest)))))
+     (if (> $count 0)
+         (/ $total $count)
+         0.0)))
 
 ;; =============================================================================
 ;; Complete Scoring Pipeline v2

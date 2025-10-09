@@ -314,12 +314,9 @@
 ;; =============================================================================
 
 ;; Math functions
-(: pow (-> Number Number Number))
-(= (pow $base 0) 1)
-(= (pow $base $exp)
-   (if (> $exp 0)
-       (* $base (pow $base (- $exp 1)))
-       1))
+;; Note: sqrt, pow, and other advanced math functions are provided by
+;; the grounded Python extension in math_ext.py and math-grounded.metta
+;; Load math-grounded.metta to use them
 
 ;; Min/Max functions
 (: min (-> Number Number Number))
