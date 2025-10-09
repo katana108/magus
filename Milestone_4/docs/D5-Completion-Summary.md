@@ -30,7 +30,7 @@ reproducibility-archive/
 ├── tests/
 │   ├── README.md                # Test suite documentation ✓
 │   ├── expected_results.md      # Expected outputs for validation ✓
-│   ├── run_all_tests.sh         # Master test runner ✓
+│   ├── run_all_tests_wsl.sh         # Master test runner ✓
 │   ├── m2_measurability/        # [To be copied from M2]
 │   ├── m2_correlation/          # [To be copied from M2]
 │   └── m4_pipeline/             # [To be copied from M4]
@@ -97,7 +97,7 @@ reproducibility-archive/
    - Validation criteria (tolerance, variations)
    - Troubleshooting test failures
 
-8. **tests/run_all_tests.sh** - Master test runner
+8. **tests/run_all_tests_wsl.sh** - Master test runner
    - Runs all 24 Python tests sequentially
    - Virtual environment check
    - Test result tracking
@@ -170,7 +170,7 @@ reproducibility-archive/
 - Python 3.12+ requirement specified ✓
 
 ✅ **Test Infrastructure**: Complete
-- Master test runner (run_all_tests.sh) ✓
+- Master test runner (run_all_tests_wsl.sh) ✓
 - Expected results documentation ✓
 - Test READMEs with instructions ✓
 
@@ -232,7 +232,7 @@ reproducibility-archive/
 4. **Make Scripts Executable** (1 minute)
    ```bash
    chmod +x environment/setup.sh
-   chmod +x tests/run_all_tests.sh
+   chmod +x tests/run_all_tests_wsl.sh
    chmod +x scripts/*.py
    ```
 
@@ -330,7 +330,7 @@ zip -r magus-reproducibility-v1.0.zip reproducibility-archive/
 
    # Step 2: Tests
    cd ../tests
-   ./run_all_tests.sh
+   ./run_all_tests_wsl.sh
 
    # Step 3: Validate
    cd ../scripts
@@ -351,7 +351,7 @@ zip -r magus-reproducibility-v1.0.zip reproducibility-archive/
 - ✅ Archive extracts without errors
 - ✅ setup.sh completes successfully
 - ✅ All dependencies install
-- ✅ run_all_tests.sh shows 24/24 Python tests PASSED
+- ✅ run_all_tests_wsl.sh shows 24/24 Python tests PASSED
 - ✅ validate_results.py confirms match
 - ✅ generate_report.py creates HTML
 - ✅ Documentation is clear and complete

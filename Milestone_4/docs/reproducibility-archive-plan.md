@@ -27,7 +27,7 @@ magus-reproducibility-v1.0/
 │   ├── m2_measurability/        # M2 measurability tests
 │   ├── m2_correlation/          # M2 correlation tests
 │   ├── m4_pipeline/             # M4 pipeline tests
-│   ├── run_all_tests.sh         # Master test runner
+│   ├── run_all_tests_wsl.sh         # Master test runner
 │   └── expected_results.md      # Expected outputs for validation
 ├── configs/
 │   ├── metrics_config.yaml      # M2 metric configurations
@@ -83,7 +83,7 @@ Complete package for reproducing MAGUS experiments from the paper:
 2. **Run all tests**:
    ```bash
    cd tests
-   ./run_all_tests.sh
+   ./run_all_tests_wsl.sh
    ```
 
 3. **Validate results**:
@@ -331,10 +331,10 @@ echo "To activate environment:"
 echo "  source environment/.venv/bin/activate"
 echo ""
 echo "To run tests:"
-echo "  cd tests && ./run_all_tests.sh"
+echo "  cd tests && ./run_all_tests_wsl.sh"
 ```
 
-### run_all_tests.sh
+### run_all_tests_wsl.sh
 ```bash
 #!/bin/bash
 # MAGUS Master Test Runner
@@ -583,7 +583,7 @@ zip -r magus-reproducibility-v1.0.zip magus-reproducibility-v1.0/
 - ✅ Archive extracts without errors
 - ✅ setup.sh completes successfully
 - ✅ All dependencies install
-- ✅ run_all_tests.sh shows 24/24 Python tests PASSED
+- ✅ run_all_tests_wsl.sh shows 24/24 Python tests PASSED
 - ✅ validate_results.py confirms match
 - ✅ generate_report.py creates HTML summary
 - ✅ Documentation is clear and complete

@@ -14,7 +14,7 @@ cd environment
 ### 2. Run all tests
 ```bash
 cd ../tests
-./run_all_tests.sh
+./run_all_tests_wsl.sh
 ```
 
 ### 3. Validate results

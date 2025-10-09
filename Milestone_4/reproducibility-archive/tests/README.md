@@ -9,7 +9,7 @@ tests/
 ├── m2_measurability/     # M2 measurability tests (12 tests)
 ├── m2_correlation/       # M2 correlation tests (7 tests)
 ├── m4_pipeline/          # M4 pipeline tests (5 tests)
-├── run_all_tests.sh      # Master test runner script
+├── run_all_tests_wsl.sh      # Master test runner script
 └── expected_results.md   # Validation criteria and expected outputs
 ```
 
@@ -17,7 +17,7 @@ tests/
 
 ### All Tests
 ```bash
-./run_all_tests.sh
+./run_all_tests_wsl.sh
 ```
 
 Expected: `24/24 Python tests PASSED`
@@ -151,11 +151,11 @@ test:
     - cd reproducibility-archive/environment
     - ./setup.sh
     - cd ../tests
-    - ./run_all_tests.sh
+    - ./run_all_tests_wsl.sh
 ```
 
 ---
 
 **Test Suite Version**: 1.0
 **Last Updated**: October 2025
-**Total Tests**: 31 (19 M2 + 5 M4 + integration verification)
+**Total Tests**: 24 Python tests (12 M2 measurability + 7 M2 correlation + 5 M4 pipeline)
