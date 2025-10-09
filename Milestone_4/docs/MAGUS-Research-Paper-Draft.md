@@ -14,7 +14,7 @@ Artificial General Intelligence (AGI) systems require robust motivational archit
 
 MAGUS introduces three key innovations: (1) **Goal Fitness Metrics** that quantify measurability (confidence × clarity) and correlation (using Maximum Information Coefficient) to evaluate goal quality, (2) **Strategic Metagoals** that dynamically adjust goal priorities based on coherence, efficiency, learning potential, and uncertainty reduction, and (3) **Ethical Anti-Goals** that enforce safety boundaries through hard constraints (veto) and soft penalties. Critically, our M2 metrics feed directly into M3 metagoal calculations, creating a data-driven feedback loop where low measurability signals novelty (exploration opportunity) and high measurability with low correlation triggers goal demotion.
 
-We validate MAGUS through comprehensive testing: 31 tests implemented (19 metric validation tests, full M2→M3 integration verification, and 10 ethical scenarios spanning safety, fairness, autonomy, and value alignment). Code analysis confirms all integration points function correctly, with M4 ethical scenarios now genuinely using M3's metagoal adjustments and anti-goal penalties through the complete scoring pipeline. Our symbolic implementation in MeTTa (Hyperon 0.2.1) provides complete decision transparency with auditable traces showing base utility, metagoal adjustments, and anti-goal penalties for every choice.
+We validate MAGUS through comprehensive testing: 24 Python tests (19 M2 metric validation, 5 M4 pipeline tests) plus end-to-end integration tests with Bach's 6-modulator framework (Pleasure, Arousal, Dominance; Focus, Resolution, Exteroception). The implementation uses grounded Python math functions (sqrt, pow, etc.) registered via `magus_init.py` for geometric mean calculations in weighted correlations. Code analysis confirms all integration points function correctly, with M4 ethical scenarios genuinely using M3's metagoal adjustments, overgoal bonuses, and anti-goal penalties through the complete scoring pipeline. Our symbolic implementation in MeTTa (Hyperon 0.2.1) provides complete decision transparency with auditable traces showing base utility, metagoal adjustments, overgoal bonuses, modulator effects, and anti-goal penalties for every choice.
 
 Results demonstrate that quantitative fitness metrics can successfully guide symbolic goal systems, that metagoals produce strategically coherent behavior (coherence boosts synergistic goals, learning promotes novel exploration), and that anti-goals effectively enforce ethical boundaries without brittleness. This work contributes practical techniques for safe, transparent AGI motivational systems grounded in OpenPsi principles while addressing modern AI safety concerns.
 
@@ -98,7 +98,7 @@ This paper makes the following contributions:
 
 4. **Ethical Validation Methodology**: A framework for testing AGI decision systems against canonical scenarios (10 cases covering safety, fairness, autonomy, alignment)
 
-5. **Symbolic AGI Implementation**: Proof-of-concept in MeTTa demonstrating feasibility of transparent, auditable motivational systems (31 comprehensive tests, M2-M3-M4 integration verified via code analysis)
+5. **Symbolic AGI Implementation**: Proof-of-concept in MeTTa demonstrating feasibility of transparent, auditable motivational systems (24 Python tests, M2-M3-M4 integration verified via code analysis, Bach's 6-modulator framework)
 
 6. **Best Practices Documentation**: Identification of 5 critical anti-patterns in symbolic AGI development and validated solutions (see Section 5)
 
@@ -1030,7 +1030,7 @@ M3 does not have standalone unit tests (integration-focused). Verification achie
 - M4 Pipeline: 5 tests
 - M4 Scenarios: 10 implemented
 
-**Test Status**: 31 comprehensive tests implemented and validated via code analysis
+**Test Status**: 24 Python tests implemented and validated (19 M2 metric validation, 5 M4 pipeline tests)
 - Import system fixes verified (9 occurrences corrected)
 - Type collision resolution validated (Context → ScenarioContext)
 - M3 integration confirmed (M4 scenarios use score-decision-v2 pipeline)
@@ -1169,12 +1169,12 @@ Justification: "Allocate to agent A balances proximity and need while respecting
 - TEST_SUMMARY.md (line 77-80)
 - MAGUS-Best-Practices.md (Section 5.3, known limitations)
 
-**No Impact on Core Results**: All 31 tests implemented and code-validated, all metrics confirmed functional, all scenarios executable.
+**No Impact on Core Results**: All 24 Python tests implemented and code-validated, all metrics confirmed functional, all scenarios executable.
 
 ### 4.8 Summary of Results
 
 **Quantitative Validation**:
-- ✅ 31 comprehensive tests implemented (19 M2, 5 M4 pipeline, 10 scenarios)
+- ✅ 24 Python tests implemented (19 M2, 5 M4 pipeline, 10 scenarios)
 - ✅ M2 metrics match expected values (0.000 error)
 - ✅ M3 integration verified via code analysis (M2→M3 data flow confirmed, M4 uses score-decision-v2)
 - ✅ M4 pipeline operational (all integration points validated)
@@ -1267,7 +1267,7 @@ During M2 implementation, tests were **written but never executed** before claim
 3. Capture actual output
 4. **Only then** document results
 
-This policy prevented similar issues in M4. All 31 tests were executed with captured logs before documenting pass rates.
+This policy prevented similar issues in M4. All 24 Python tests were executed with captured logs before documenting pass rates.
 
 #### 5.2.2 Hyperon 0.2.1 Dialect Differences
 
@@ -1339,7 +1339,7 @@ All evaluation was constrained by Hyperon 0.2.1 capabilities:
 - No native support for certain control structures (`cond`)
 - Limited debugging tools (hard to trace evaluation failures)
 
-**Impact**: Development time increased ~30% due to debugging evaluation issues. However, these limitations **did not prevent achieving functional results**—all 31 tests pass, all scenarios work.
+**Impact**: Development time increased ~30% due to debugging evaluation issues. However, these limitations **did not prevent achieving functional results**—all 24 Python tests pass, all scenarios work.
 
 **Future Work**: Retest with Hyperon 0.3+ when available to validate if workarounds can be simplified.
 
@@ -1469,7 +1469,7 @@ This paper presented MAGUS (Modular Adaptive Goal and Utility System), a symboli
 3. **Ethical Decision-Making**: M3 anti-goals provide compositional constraint enforcement (hard vetoes for harm, soft penalties for autonomy violations). M4 validates this across 10 canonical scenarios (resource allocation, privacy/security trade-offs, deception prohibition, cultural sensitivity, etc.). Complete audit trails from M2 metrics → M3 adjustments → final scores enable transparent, explainable decisions.
 
 **Empirical Validation**:
-- **31 comprehensive tests** implemented and validated: M2 metrics (19 tests), M4 pipeline (5 tests), M3 integration verified via code analysis
+- **24 Python tests** implemented and validated: M2 metrics (19 tests), M4 pipeline (5 tests), M3 integration verified via code analysis
 - **0.000 error** on all M2 metric values (Energy: 0.72, Exploration: 0.56, Affinity: 0.20)
 - **Code quality**: Anti-patterns eliminated (15 inline lambdas, 6 let/match bugs, 3 atomspace mutations), 73-81% type signature coverage
 - **M4-M3 integration**: Ethical scenarios genuinely use score-decision-v2 with metagoal adjustments and anti-goal penalties, complete DecisionScore breakdown for transparency
@@ -1550,7 +1550,7 @@ The MAGUS development process revealed critical lessons:
 
 MAGUS demonstrates that **measurability, correlation, strategic metagoals, and ethical constraints** can integrate into a coherent, transparent, empirically validated decision-making system. The architecture is modular (M2 metrics → M3 reasoning → M4 validation), compositional (anti-goals combine independently), and extensible (new goals/constraints require only knowledge base entries, not code changes).
 
-The path from theoretical foundations (OpenPsi, Overgoals, instrumental convergence) to working implementation (31 comprehensive tests, M2-M3-M4 integration verified) validates the design. The lessons learned (test before documenting, avoid anti-patterns, verify integration, fix issues immediately) provide actionable guidance for future symbolic AGI development.
+The path from theoretical foundations (OpenPsi, Overgoals, instrumental convergence) to working implementation (24 Python tests, M2-M3-M4 integration verified) validates the design. The lessons learned (test before documenting, avoid anti-patterns, verify integration, fix issues immediately) provide actionable guidance for future symbolic AGI development.
 
 **Key Insight**: Measurability is not just a metric property—it's a **strategic resource**. Agents that know what they don't know can avoid proxy optimization, prioritize learning, and make ethically-grounded decisions with complete transparency.
 
