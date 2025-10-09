@@ -163,7 +163,7 @@ If tests run significantly slower:
 ## Success Criteria
 
 **✓ Tests are passing if**:
-1. All 31 tests execute without Python exceptions
+1. All 24 Python tests execute without Python exceptions (12 measurability + 7 correlation + 5 M4 pipeline)
 2. All test assertions pass
 3. Metric values match expected within tolerance
 4. Validation script confirms baseline match

@@ -789,7 +789,7 @@ def test_measurability():
     assert result == [[0.72]], f"Expected 0.72, got {result}"
 ```
 
-31 total tests: 19 M2 (metrics), 5 M4 (pipeline), plus M3 integration verification.
+24 Python tests: 12 M2 measurability, 7 M2 correlation, 5 M4 pipeline, plus M3 integration verification via E2E tests.
 
 ---
 
