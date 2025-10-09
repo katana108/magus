@@ -20,7 +20,7 @@ tests/
 ./run_all_tests.sh
 ```
 
-Expected: `31/31 tests PASSED`
+Expected: `24/24 Python tests PASSED`
 
 ### Individual Test Suites
 
@@ -87,7 +87,7 @@ Before running tests:
 See `expected_results.md` for detailed validation criteria.
 
 **Summary**:
-- All 31 tests should pass
+- All 24 Python tests should pass
 - Metric values should match expected within ±0.01 tolerance
 - No Python exceptions or MeTTa parsing errors
 

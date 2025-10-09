@@ -98,7 +98,7 @@ reproducibility-archive/
    - Troubleshooting test failures
 
 8. **tests/run_all_tests.sh** - Master test runner
-   - Runs all 31 tests sequentially
+   - Runs all 24 Python tests sequentially
    - Virtual environment check
    - Test result tracking
    - Summary report
@@ -240,7 +240,7 @@ reproducibility-archive/
    - Create fresh Ubuntu 22.04 VM or Docker container
    - Extract archive
    - Follow README.md quick start
-   - Verify all 31 tests pass
+   - Verify all 24 Python tests pass
    - Run validation script
    - Generate HTML report
 
@@ -341,7 +341,7 @@ zip -r magus-reproducibility-v1.0.zip reproducibility-archive/
    ```
 
 4. **Verify Results**
-   - ✅ All 31 tests pass
+   - ✅ All 24 Python tests pass
    - ✅ Validation script confirms baseline match
    - ✅ HTML report generated successfully
    - ✅ No errors or warnings
@@ -456,7 +456,7 @@ The reproducibility archive infrastructure is fully implemented with all documen
 
 **Key Achievement**: Complete standalone package that enables independent researchers to:
 1. Set up environment in <5 minutes (one command)
-2. Run all 31 tests in <1 minute
+2. Run all 24 Python tests in <1 minute
 3. Validate results against baseline automatically
 4. Generate HTML summary report
 

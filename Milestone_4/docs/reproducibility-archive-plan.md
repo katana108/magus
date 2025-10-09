@@ -100,7 +100,7 @@ Complete package for reproducing MAGUS experiments from the paper:
 - M2 Tests: 19/19 passing
 - M3 Integration: Verified
 - M4 Pipeline: 5/5 passing
-- Total: 31/31 tests (100%)
+- Total: 24/24 Python tests (100%)
 
 ## System Requirements
 - Python 3.12+
@@ -268,7 +268,7 @@ For issues not covered here, see:
 ## Validation Criteria
 
 **Test run is successful if**:
-- All 31 tests pass (100% pass rate)
+- All 24 Python tests pass (100% pass rate)
 - Measurability values match ±0.01 tolerance
 - Correlation values match ±0.01 tolerance
 - No Python exceptions or MeTTa parsing errors
@@ -576,7 +576,7 @@ zip -r magus-reproducibility-v1.0.zip magus-reproducibility-v1.0/
 1. Fresh Ubuntu 22.04 VM or WSL instance
 2. Only Python 3.12 installed
 3. Follow README.md quick start exactly
-4. All 31 tests must pass
+4. All 24 Python tests must pass
 5. validate_results.py confirms baseline match
 
 ### Acceptance Criteria

@@ -4,6 +4,8 @@
 **Branch**: LLM_Tutorial (metta-magus), MettaLessonsLearned (knowledge-repo)
 **Status**: All issues resolved ✅
 
+> **Note**: This document shows "Before/After" comparisons. References to "31/31 tests" in **Before** sections are historical examples showing what was changed. The **current** implementation has **24/24 Python tests** (12 measurability + 7 correlation + 5 M4 pipeline).
+
 ---
 
 ## Executive Summary

@@ -18,7 +18,7 @@
 - ✅ Introduction (2,400 words) - Three fundamental challenges, theoretical foundations
 - ✅ Background/Related Work (1,750 words) - Positions MAGUS in research landscape
 - ✅ Methodology (2,500 words) - M2 metrics, M3 metagoals/anti-goals, M4 scenarios
-- ✅ Results (1,600 words) - Quantitative validation (31/31 tests), qualitative examples
+- ✅ Results (1,600 words) - Quantitative validation (24/24 Python tests), qualitative examples
 - ✅ Discussion (2,600 words) - Insights, lessons learned, threats to validity
 - ✅ Conclusion (1,000 words) - Contributions, implications, future work
 - ✅ References (35 citations) - Formatted in IEEE style
@@ -37,7 +37,7 @@
 - Figure 1: System architecture diagram (M2→M3→M4 data flow)
 - Table 1: M2 measurability results (Energy: 0.72, Exploration: 0.56, Affinity: 0.20)
 - Table 2: M2 correlation matrix (symmetric, MIC-based)
-- Table 3: Test results summary (31/31 tests, 100% pass rate)
+- Table 3: Test results summary (24/24 Python tests, 100% pass rate)
 - Table 4: Anti-pattern impact analysis (20 hours technical debt)
 - Figure 2: M3 scoring pipeline decision trace (complete transparency)
 - Figure 3: Ethical scenario comparison (score progression through pipeline)
@@ -64,10 +64,12 @@
 ### Empirical Validation
 
 **Quantitative Results**:
-- 31/31 tests passing (100%)
+- 24/24 Python tests passing (100%): 12 measurability + 7 correlation + 5 M4 pipeline
+- Run via WSL with magus_init.py grounded math registration
 - 0.000 error on all M2 metric values
 - 73-81% type signature coverage
 - 100% veto of hard constraint violations
+- Bach's 6-modulator framework (PAD + Attentional) implemented
 
 **Qualitative Results**:
 - Complete decision transparency (audit trails M2→M3→M4)
@@ -247,7 +249,7 @@ Reproducibility archive (D5) will provide:
 
 The research paper successfully documents MAGUS from theoretical foundations through implementation to lessons learned. All sections are drafted, references compiled, and figure specifications created. The paper is ready for final formatting and submission to AGI/AI Safety venues.
 
-**Key Achievement**: Comprehensive technical paper (~11,200 words) with 35 references, 6 figures/tables, and complete validation (31/31 tests). Honestly documents both successes (measurability-driven metagoals work) and failures (test-then-document mistake, anti-patterns).
+**Key Achievement**: Comprehensive technical paper (~11,200 words) with 35 references, 6 figures/tables, and complete validation (24/24 Python tests). Honestly documents both successes (measurability-driven metagoals work) and failures (test-then-document mistake, anti-patterns).
 
 **Ready for**: Final proofreading, figure generation, and conference template application.
 

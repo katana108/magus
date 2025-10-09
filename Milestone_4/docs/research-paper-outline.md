@@ -22,7 +22,7 @@
 - **Problem**: AGI systems require robust motivational architectures that balance goal pursuit with ethical constraints
 - **Approach**: MAGUS implements data-driven goal fitness metrics (measurability, correlation), strategic metagoals, and ethical anti-goals in MeTTa
 - **Contribution**: Novel integration of quantitative metrics with symbolic reasoning for transparent ethical decision-making
-- **Results**: 100% test pass rate across 31 tests, 10 ethical scenarios validated, M2 metrics successfully integrated into M3 metagoals
+- **Results**: 100% test pass rate across 24 Python tests, 10 ethical scenarios validated, M2 metrics successfully integrated into M3 metagoals
 - **Significance**: Demonstrates feasibility of combining OpenPsi-style motivational systems with modern ethical AI constraints in symbolic AGI framework
 
 ---
@@ -221,7 +221,7 @@ FinalScore = (BaseUtility + MetagoalAdjustment) × (1 - AntiGoalPenalty)
   - Equality-based dispatch (avoid let/match pattern)
   - No atomspace mutation in lambdas
   - Knowledge bases for persistent data, not volatile state
-- **Testing**: 31/31 tests passing (100%)
+- **Testing**: 24/24 Python tests passing (100%)
 
 ---
 
