@@ -99,10 +99,14 @@ python Milestone_4/tests/test_m4_pipeline.py
 **Scoring v2** - Integrated pipeline:
 - Base utility (considerations - discouragements)
 - Metagoal adjustments (connected to M2 metrics)
+- Overgoal adjustments (goal set coherence via weighted correlations)
+- Modulator effects (Bach's 6-modulator framework: PAD + Attentional)
 - Anti-goal penalties (multiplicative)
-- Final score = (base + metagoal) × (1 - antigoal)
+- Final score = (base + metagoal + overgoal) × modulators × (1 - antigoal)
 
-**Status**: All modules integrated, M2-M3 data flow verified
+**Modulators**: See [BACH-MODULATORS-FRAMEWORK.md](BACH-MODULATORS-FRAMEWORK.md) for full documentation
+
+**Status**: All modules integrated, M2-M3 data flow verified, overgoal active
 
 ### Milestone 4: Ethical Evaluation Framework ✅
 
@@ -135,6 +139,10 @@ python Milestone_4/tests/test_m4_pipeline.py
 M2 Metrics (Measurability, Correlation)
          ↓
 M3 Metagoals (Strategic Adjustments)
+         ↓
+M3 Overgoal (Goal Set Coherence)
+         ↓
+M3 Modulators (Bach's 6-modulator framework)
          ↓
 M3 Anti-goals (Constraints)
          ↓

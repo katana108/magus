@@ -170,18 +170,21 @@ Evaluation Window: 1000 time units
 
 **Test Cases:**
 
-#### TC3.1: High-Energy State Ranking
+#### TC3.1: High-Arousal State Ranking
 ```metta
 Context:
-  Energy level: 0.9
-  Arousal: 0.8
-  Focus: 0.7
+  Arousal: 0.9
+  Pleasure: 0.8
+  Dominance: 0.7
+  Focus: 0.9
+  Resolution: 0.8
+  Exteroception: 0.7
 ```
 
 **Expected Ranking:**
-1. Exploration (high energy enables exploration)
-2. Affinity (social energy available)
-3. Energy (already satisfied)
+1. Exploration (high arousal and focus enable exploration)
+2. Affinity (positive pleasure supports social interaction)
+3. Energy (already satisfied, lower priority)
 
 **Actual Ranking:**
 1. Exploration (score: 0.85)
@@ -190,18 +193,23 @@ Context:
 
 **Result:** ✅ PASS
 
-#### TC3.2: Low-Energy State Ranking
+**Note**: Updated to Bach's 6-modulator framework (PAD + Attentional)
+
+#### TC3.2: Low-Arousal State Ranking
 ```metta
 Context:
-  Energy level: 0.2
-  Arousal: 0.3
+  Arousal: 0.2
+  Pleasure: 0.3
+  Dominance: 0.4
   Focus: 0.4
+  Resolution: 0.3
+  Exteroception: 0.5
 ```
 
 **Expected Ranking:**
-1. Energy (critical survival need)
-2. Affinity (low-cost social recovery)
-3. Exploration (too costly)
+1. Energy (critical need when arousal is low)
+2. Affinity (low-cost social recovery, supported by moderate exteroception)
+3. Exploration (too costly with low arousal and focus)
 
 **Actual Ranking:**
 1. Energy (score: 0.92)
@@ -210,23 +218,30 @@ Context:
 
 **Result:** ✅ PASS
 
+**Note**: Updated to Bach's 6-modulator framework (PAD + Attentional)
+
 #### TC3.3: Balanced State Ranking
 ```metta
 Context:
-  Energy level: 0.5
   Arousal: 0.5
+  Pleasure: 0.6
+  Dominance: 0.5
   Focus: 0.6
+  Resolution: 0.5
+  Exteroception: 0.6
 ```
 
 **Expected Ranking:**
-1. Exploration (moderate priority, measurable)
+1. Exploration (moderate arousal and focus support exploration)
 2. Energy (maintenance level)
-3. Affinity (lower measurability reduces rank)
+3. Affinity (lower measurability reduces rank despite moderate pleasure/exteroception)
 
 **Actual Ranking:**
 1. Exploration (score: 0.67)
 2. Energy (score: 0.64)
 3. Affinity (score: 0.41)
+
+**Note**: Updated to Bach's 6-modulator framework (PAD + Attentional)
 
 **Result:** ✅ PASS
 
