@@ -19,36 +19,21 @@ from pathlib import Path
 
 from hyperon import MeTTa
 
-# Ensure we can import initialisation helper
-import sys
-sys.path.insert(0, str(Path(__file__).parent))
-
+# Import shared test fixtures
+from test_fixtures import (
+    get_metta_number,
+    assert_nonempty,
+    EXPECTED_MEASURABILITIES,
+    EXPECTED_BASE_CORRELATIONS,
+    EXPECTED_WEIGHTED_CORRELATIONS,
+    EXPECTED_OVERGOAL_BONUS,
+)
 from magus_init import initialize_magus
 
 
 def _run(metta: MeTTa, expr: str):
     """Run a MeTTa expression and return the raw result list."""
     return metta.run(expr.strip())
-
-
-def _get_number(metta: MeTTa, expr: str) -> float:
-    """Execute a MeTTa expression that should yield a single numeric value."""
-    result = _run(metta, expr)
-    if not result:
-        raise AssertionError(f"Expression returned no values: {expr}")
-    value = result[0]
-    if isinstance(value, list):
-        if not value:
-            raise AssertionError(f"Expression returned empty list: {expr}")
-        value = value[0]
-    if hasattr(value, 'get_object'):
-        value = value.get_object()
-    if hasattr(value, 'value'):
-        value = value.value
-    try:
-        return float(value)
-    except Exception as exc:  # pragma: no cover - defensive
-        raise AssertionError(f"Could not convert result to float: {value}") from exc
 
 
 def main() -> None:
@@ -78,16 +63,16 @@ def main() -> None:
         print(f"  ✓ Loaded {module_path.name}")
 
     print("\n3. Fetching measurability values (M2)...")
-    energy_meas = _get_number(metta, '!(get-measurability energy)')
-    exploration_meas = _get_number(metta, '!(get-measurability exploration)')
-    affinity_meas = _get_number(metta, '!(get-measurability affinity)')
+    energy_meas = get_metta_number(metta, '!(get-measurability energy)')
+    exploration_meas = get_metta_number(metta, '!(get-measurability exploration)')
+    affinity_meas = get_metta_number(metta, '!(get-measurability affinity)')
     print(f"  energy measurability:     {energy_meas:.3f}")
     print(f"  exploration measurability: {exploration_meas:.3f}")
     print(f"  affinity measurability:    {affinity_meas:.3f}")
 
     print("\n4. Fetching base correlations (M2)...")
-    corr_energy_exploration = _get_number(metta, '!(get-correlation energy exploration)')
-    corr_energy_affinity = _get_number(metta, '!(get-correlation energy affinity)')
+    corr_energy_exploration = get_metta_number(metta, '!(get-correlation energy exploration)')
+    corr_energy_affinity = get_metta_number(metta, '!(get-correlation energy affinity)')
     print(f"  energy-exploration: {corr_energy_exploration:.3f}")
     print(f"  energy-affinity:    {corr_energy_affinity:.3f}")
 
@@ -122,7 +107,7 @@ def main() -> None:
                 (Cons (modulator arousal 0.8) Nil)
                 1000))
     ''')
-    _assert_nonempty(pipeline_result)
+    assert_nonempty(pipeline_result)
     print("  ✓ Scoring pipeline executed without errors")
 
     print("\n" + "=" * 70)
@@ -134,11 +119,6 @@ def main() -> None:
     print("  ✓ Scoring pipeline executes successfully")
     print("\n  OVERGOAL SCORING INTEGRATION CONFIRMED")
     print("=" * 70)
-
-
-def _assert_nonempty(result):
-    if not result:
-        raise AssertionError("Expected non-empty result")
 
 
 if __name__ == '__main__':
