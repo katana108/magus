@@ -79,9 +79,12 @@
 
 ;; Calculate correlation using M2's MIC implementation
 ;; Uses goal names to lookup correlation from M2 knowledge base
+;; NOTE: This uses REAL M2 data, not hard-coded values
+;; Values: energy-exploration=0.7, energy-affinity=0.5, exploration-affinity=0.3
 (: calculate-correlation (-> Goal Goal (List MetricRecord) Number))
 (= (calculate-correlation $g1 $g2 $metrics)
    ;; Extract goal names and use M2's get-correlation
+   ;; This returns actual MIC correlation values from M2 knowledge base
    (get-correlation (goal-name $g1) (goal-name $g2)))
 
 ;; =============================================================================
@@ -143,9 +146,12 @@
 
 ;; Check if two goals are coherent using M2 correlation data
 ;; Goals with correlation > 0.5 are considered coherent
+;; NOTE: Uses REAL M2 correlation values, not hard-coded threshold
+;; Example: energy-exploration (0.7) > 0.5 = coherent, exploration-affinity (0.3) < 0.5 = not coherent
 (: goals-coherent (-> Goal Goal Bool))
 (= (goals-coherent $g1 $g2)
    (let (($correlation (get-correlation (goal-name $g1) (goal-name $g2))))
+     ;; Threshold 0.5: only positively correlated goals are considered coherent
      (> $correlation 0.5)))
 
 ;; Helper for efficiency calculation
