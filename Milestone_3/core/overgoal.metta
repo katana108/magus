@@ -11,16 +11,22 @@
 ;;   overgoal(G) = average( weighted_correlation(G, Gi) for all Gi != G )
 ;;   where weighted_correlation(A, B) = base_correlation(A, B) × gmean(measurability(A), measurability(B))
 
-;; Import types and math functions
+;; Import types, math functions, and M2 measurability framework
 !(load types.metta)
 !(load math-grounded.metta)
+
+;; Import M2's weighted correlation calculation (canonical implementation)
+;; This provides get-weighted-correlation which uses get-measurability internally
+;; No need to duplicate the geometric mean formula here
+;; Note: We keep get-weighted-correlation-for-overgoal as a wrapper for explicit values
 
 ;; =============================================================================
 ;; Overgoal Calculation Functions
 ;; =============================================================================
 
-;; Calculate weighted correlation between two goals
-;; This is the core overgoal computation: base correlation scaled by measurabilities
+;; Calculate weighted correlation between two goals (explicit values version)
+;; This is a lower-level function that takes explicit measurability values
+;; For automatic lookup, use M2's get-weighted-correlation instead
 (: get-weighted-correlation-for-overgoal (-> Symbol Symbol Number Number Number Number))
 (= (get-weighted-correlation-for-overgoal $goal1 $goal2 $base-corr $meas1 $meas2)
    ;; weighted = base_correlation × geometric_mean(measurability1, measurability2)
