@@ -227,6 +227,97 @@ def test_ablation_framework():
     print(f"SUCCESS: Ablation reset to True: {result[0]}")
     return True
 
+def test_anna_e2e_modulators():
+    """Test all 6 modulators from Anna's architectural vision (PAD + Attentional)"""
+    print_section("ANNA'S E2E MODULATOR TEST")
+
+    metta = MeTTa()
+    base_dir = Path(__file__).parent.parent
+
+    # Load modules
+    print("\nLoading modules...")
+    modules = [
+        base_dir.parent / 'types.metta',
+        base_dir.parent / 'math-grounded.metta',
+        base_dir / '../Milestone_2/goal-fitness-metrics/measurability/initial_measurability_calculation.metta',
+        base_dir / '../Milestone_2/goal-fitness-metrics/correlation/initial_correlation_calculation.metta',
+        base_dir / '../Milestone_3/core/metagoals.metta',
+        base_dir / '../Milestone_3/core/antigoals.metta',
+        base_dir / '../Milestone_3/core/overgoal.metta',
+        base_dir / '../Milestone_3/core/scoring-v2.metta',
+    ]
+
+    for module_path in modules:
+        if not module_path.exists():
+            print(f"  ERROR: Module not found: {module_path}")
+            return False
+        print(f"  Loading {module_path.name}...")
+        try:
+            with open(module_path, 'r', encoding='utf-8') as f:
+                metta.run(f.read())
+        except FileNotFoundError as e:
+            print(f"  ERROR: Could not read {module_path.name}: {e}")
+            return False
+        except ValueError as e:
+            print(f"  ERROR: Invalid MeTTa syntax in {module_path.name}: {e}")
+            return False
+
+    # Test all 6 modulators (PAD + Attentional)
+    print("\n--- Testing All 6 Modulators (Bach Framework) ---")
+    print("  PAD: Pleasure, Arousal, Dominance")
+    print("  Attentional: Focus, Resolution, Exteroception")
+
+    modulators = [
+        ('arousal', 0.8, 0.8, 1.2),
+        ('pleasure', 0.6, 0.9, 1.1),
+        ('dominance', 0.7, 0.85, 1.15),
+        ('focus', 0.9, 0.7, 1.3),
+        ('resolution', 0.8, 0.75, 1.25),
+        ('exteroception', 0.7, 0.8, 1.2)
+    ]
+
+    all_passed = True
+    for mod_name, mod_value, range_min, range_max in modulators:
+        result = metta.run(f'!(modulator-effect {mod_name} {mod_value})')
+        if not result:
+            print(f"  ✗ {mod_name}: No result returned")
+            all_passed = False
+            continue
+
+        result_str = str(result[0])
+        try:
+            # Extract numeric value
+            import re
+            numbers = re.findall(r'\d+\.?\d*', result_str)
+            if numbers:
+                actual = float(numbers[0])
+            else:
+                actual = 1.0
+        except:
+            actual = 1.0
+
+        # Check if modulator has an effect (not returning 1.0)
+        has_effect = abs(actual - 1.0) > 0.01
+        # Check if value is in expected range
+        in_range = range_min <= actual <= range_max
+
+        if has_effect and in_range:
+            print(f"  ✓ {mod_name}({mod_value}): {actual:.3f} [range: {range_min}-{range_max}]")
+        elif has_effect:
+            print(f"  ⚠ {mod_name}({mod_value}): {actual:.3f} (has effect but outside expected range)")
+        else:
+            print(f"  ✗ {mod_name}({mod_value}): {actual:.3f} (no effect, returned ~1.0)")
+            all_passed = False
+
+    if all_passed:
+        print("\n  SUCCESS: All 6 modulators implemented and functional")
+        print("  Architecture aligns with Anna's vision (PAD + Attentional)")
+    else:
+        print("\n  FAILURE: Some modulators not working as expected")
+
+    return all_passed
+
+
 def test_integration_modules():
     """Test AIRIS and HERMES integration modules load"""
     print_section("INTEGRATION MODULES TEST")
@@ -301,6 +392,12 @@ def main():
         print(f"\nERROR in integration modules test: {e}")
         results['integration_modules'] = False
 
+    try:
+        results['anna_e2e_modulators'] = test_anna_e2e_modulators()
+    except Exception as e:
+        print(f"\nERROR in Anna's E2E modulator test: {e}")
+        results['anna_e2e_modulators'] = False
+
     # Summary
     print_section("TEST SUMMARY")
 
@@ -317,6 +414,7 @@ def main():
     print("\n" + "="*70)
     if passed == total:
         print("  ALL M4 PIPELINE TESTS PASSED")
+        print("  Including Anna's E2E Modulator Validation")
     else:
         print(f"  {total - passed} TEST(S) FAILED - SEE DETAILS ABOVE")
     print("="*70)
