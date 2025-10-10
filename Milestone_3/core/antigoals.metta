@@ -19,6 +19,14 @@
 (: risk-threshold (-> Number))
 (= (risk-threshold) 0.6)
 
+;; Penalty factors for anti-goal discouragement
+(: energy-penalty-factor (-> Number))
+(= (energy-penalty-factor) 0.5)  ;; Moderate penalty when energy cost exceeds threshold
+(: risk-penalty-factor (-> Number))
+(= (risk-penalty-factor) 0.3)    ;; Higher penalty for risky actions
+(: risky-goal-penalty (-> Number))
+(= (risky-goal-penalty) 0.7)     ;; Moderate penalty for inherently risky goals
+
 ;; Energy Efficiency anti-goal - discourages high energy cost actions
 (: energy-efficiency-antigoal (-> AntiGoal))
 (= (energy-efficiency-antigoal)
@@ -29,7 +37,7 @@
 (= (energy-penalty $context (action-candidate (action $name $params)))
    (let (($cost (calculate-energy-cost $name $params $context)))
      (if (> $cost (energy-threshold))
-         (* 0.5 (/ (energy-threshold) $cost))  ;; Multiplicative factor
+         (* (energy-penalty-factor) (/ (energy-threshold) $cost))  ;; Multiplicative factor
          1.0)))  ;; No penalty
 (= (energy-penalty $context (goal-candidate $goal))
    1.0)  ;; Goals don't have direct energy cost
@@ -50,11 +58,11 @@
 (= (risk-penalty $context (action-candidate (action $name $params)))
    (let (($risk (calculate-risk-level $name $params $context)))
      (if (> $risk (risk-threshold))
-         (* 0.3 (/ (risk-threshold) $risk))  ;; Higher penalty for risky actions
+         (* (risk-penalty-factor) (/ (risk-threshold) $risk))  ;; Higher penalty for risky actions
          1.0)))
 (= (risk-penalty $context (goal-candidate (goal $name $p $w)))
    (if (is-risky-goal-v2 $name)
-       0.7  ;; Moderate penalty for risky goals
+       (risky-goal-penalty)  ;; Moderate penalty for risky goals
        1.0))
 
 ;; Note: estimate-risk is now replaced by calculate-risk-level from antigoal-costs.metta
