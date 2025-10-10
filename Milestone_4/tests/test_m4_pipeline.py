@@ -30,12 +30,18 @@ def test_scenario_schema():
     ]
 
     for module_path in modules:
-        if module_path.exists():
-            print(f"  Loading {module_path.name}...")
+        if not module_path.exists():
+            print(f"  ERROR: Module not found: {module_path}")
+            return False
+        print(f"  Loading {module_path.name}...")
+        try:
             with open(module_path, 'r', encoding='utf-8') as f:
                 metta.run(f.read())
-        else:
-            print(f"  WARNING: Module not found: {module_path}")
+        except FileNotFoundError as e:
+            print(f"  ERROR: Could not read {module_path.name}: {e}")
+            return False
+        except ValueError as e:
+            print(f"  ERROR: Invalid MeTTa syntax in {module_path.name}: {e}")
             return False
 
     # Test scenario registration
@@ -80,14 +86,19 @@ def test_ethical_logging():
     ]
 
     for module_path in modules:
-        if module_path.exists():
-            print(f"  Loading {module_path.name}...")
+        if not module_path.exists():
+            print(f"  ERROR: Module not found: {module_path}")
+            return False
+        print(f"  Loading {module_path.name}...")
+        try:
             with open(module_path, 'r', encoding='utf-8') as f:
-                try:
-                    metta.run(f.read())
-                except Exception as e:
-                    print(f"  ERROR loading {module_path.name}: {e}")
-                    return False
+                metta.run(f.read())
+        except FileNotFoundError as e:
+            print(f"  ERROR: Could not read {module_path.name}: {e}")
+            return False
+        except ValueError as e:
+            print(f"  ERROR: Invalid MeTTa syntax in {module_path.name}: {e}")
+            return False
 
     # Test log entry creation
     print("\n--- Testing Log Entry Creation ---")
@@ -130,14 +141,19 @@ def test_metrics_collection():
     ]
 
     for module_path in modules:
-        if module_path.exists():
-            print(f"  Loading {module_path.name}...")
+        if not module_path.exists():
+            print(f"  ERROR: Module not found: {module_path}")
+            return False
+        print(f"  Loading {module_path.name}...")
+        try:
             with open(module_path, 'r', encoding='utf-8') as f:
-                try:
-                    metta.run(f.read())
-                except Exception as e:
-                    print(f"  ERROR loading {module_path.name}: {e}")
-                    return False
+                metta.run(f.read())
+        except FileNotFoundError as e:
+            print(f"  ERROR: Could not read {module_path.name}: {e}")
+            return False
+        except ValueError as e:
+            print(f"  ERROR: Invalid MeTTa syntax in {module_path.name}: {e}")
+            return False
 
     # Test metric collection
     print("\n--- Testing Metric Collection ---")
@@ -180,15 +196,19 @@ def test_ablation_framework():
     ]
 
     for module_path in modules:
-        if module_path.exists():
-            print(f"  Loading {module_path.name}...")
+        if not module_path.exists():
+            print(f"  ERROR: Module not found: {module_path}")
+            return False
+        print(f"  Loading {module_path.name}...")
+        try:
             with open(module_path, 'r', encoding='utf-8') as f:
-                try:
-                    metta.run(f.read())
-                except Exception as e:
-                    print(f"  ERROR loading {module_path.name}: {e}")
-                    # Continue even if there are errors
-                    pass
+                metta.run(f.read())
+        except FileNotFoundError as e:
+            print(f"  ERROR: Could not read {module_path.name}: {e}")
+            return False
+        except ValueError as e:
+            print(f"  ERROR: Invalid MeTTa syntax in {module_path.name}: {e}")
+            return False
 
     # Test ablation setting
     print("\n--- Testing Ablation Configuration ---")
@@ -223,22 +243,23 @@ def test_integration_modules():
         base_dir / 'integration' / 'hermes_v2.metta',
     ]
 
-    success = True
     for module_path in modules:
-        if module_path.exists():
-            print(f"  Loading {module_path.name}...")
-            try:
-                with open(module_path, 'r', encoding='utf-8') as f:
-                    metta.run(f.read())
-                print(f"    SUCCESS: {module_path.name} loaded")
-            except Exception as e:
-                print(f"    ERROR: Failed to load {module_path.name}: {e}")
-                success = False
-        else:
-            print(f"  WARNING: Module not found: {module_path}")
-            success = False
+        if not module_path.exists():
+            print(f"  ERROR: Module not found: {module_path}")
+            return False
+        print(f"  Loading {module_path.name}...")
+        try:
+            with open(module_path, 'r', encoding='utf-8') as f:
+                metta.run(f.read())
+            print(f"    SUCCESS: {module_path.name} loaded")
+        except FileNotFoundError as e:
+            print(f"    ERROR: Could not read {module_path.name}: {e}")
+            return False
+        except ValueError as e:
+            print(f"    ERROR: Invalid MeTTa syntax in {module_path.name}: {e}")
+            return False
 
-    return success
+    return True
 
 def main():
     """Main test execution"""
